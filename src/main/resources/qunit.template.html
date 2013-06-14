@@ -1,0 +1,46 @@
+<html>
+<head>
+    <script type="text/javascript" src="/qunit-mojo/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="/qunit-mojo/qunit-1.11.0.js"></script>
+    <script>
+        QUnit.config.autostart = false;
+    </script>
+    <link rel="stylesheet" href="/qunit-mojo/qunit-1.11.0.css" type="text/css" media="screen"/>
+    YOUR_REQUIRE_DOT_JS_CONFIG_GOES_HERE
+    <script type="text/javascript" src="/qunit-mojo/require-2.1.1.min.js"></script>
+    <script>
+    	function errorHandler(error){
+    	    var message = 
+    	               "Sorry, I could not start qunit because require.js couldn't load YOUR_JAVASCRIPT_TEST_FILE_GOES_HERE: " + error.message + "\n" + 
+    	               "Here are some details about the require.js error:\n" + 
+    	    	 	   "     type:" + error.requireType + "\n" + 
+    	    	 	   "  modules:" + error.requireModules;
+    	    if(error.stack) {
+    	        message += "\n" + 
+	    	 	   "Stacktrace:\n" + + error.stack;   
+    	    }
+    	    
+    	    console.log(message);
+    	    
+    	    test("Require.js load failure", function(){
+    	        ok(false, message);
+    	    });
+    	    QUnit.start();
+    	}
+            require(["YOUR_JAVASCRIPT_TEST_FILE_GOES_HERE"], QUnit.start, errorHandler);
+
+    </script>
+</head>
+
+<body>
+<a href="/">ALL TESTS</a>
+    <h1 id="qunit-header">QUnit Test</h1>
+
+    <h2 id="qunit-banner"></h2>
+	
+    <div id="qunit-testrunner-toolbar"></div>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+
+</body>
+</html>
