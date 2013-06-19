@@ -91,18 +91,18 @@
     </dependencies>
 
     <!-- BEGIN: STUFF REQUIRED BY THE CENTRAL REPO -->
-    <description>qunit-maven-plugin</description>
-    <url>https://github.com/cjdev/qunit-maven-plugin</url>
+    <description>qunit-mojo</description>
+    <url>https://github.com/cjdev/qunit-mojo</url>
     <licenses>
         <license>
             <name>GPL 2 + classpath exception</name>
-            <url>https://raw.github.com/cjdev/qunit-maven-plugin/master/LICENSE</url>
+            <url>https://raw.github.com/cjdev/qunit-mojo/master/LICENSE</url>
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:cjdev/qunit-maven-plugin.git</connection>
-        <url>scm:git:git@github.com:cjdev/qunit-maven-plugin.git</url>
-        <developerConnection>scm:git:git@github.com:cjdev/qunit-maven-plugin.git</developerConnection>
+        <connection>scm:git:git@github.com:cjdev/qunit-mojo.git</connection>
+        <url>scm:git:git@github.com:cjdev/qunit-mojo.git</url>
+        <developerConnection>scm:git:git@github.com:cjdev/qunit-mojo.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
