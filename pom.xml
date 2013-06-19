@@ -82,4 +82,30 @@
             <version>0.3.0</version>
         </dependency>
     </dependencies>
+
+    <!-- BEGIN: STUFF REQUIRED BY THE CENTRAL REPO -->
+    <description>qunit-maven-plugin</description>
+    <url>https://github.com/cjdev/qunit-maven-plugin</url>
+    <licenses>
+        <license>
+            <name>GPL 2 + classpath exception</name>
+            <url>https://raw.github.com/cjdev/qunit-maven-plugin/master/LICENSE</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git@github.com:cjdev/qunit-maven-plugin.git</connection>
+        <url>scm:git:git@github.com:cjdev/qunit-maven-plugin.git</url>
+        <developerConnection>scm:git:git@github.com:cjdev/qunit-maven-plugin.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>stu</id>
+            <name>Stu Penrose</name>
+            <email>stu@penrose.us</email>
+        </developer>
+    </developers>
+    <!-- END: STUFF REQUIRED BY THE CENTRAL REPO -->
+
 </project>
