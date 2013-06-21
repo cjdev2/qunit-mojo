@@ -24,7 +24,7 @@ define([], function(){
 stu@knox:~/projects/my-web-project mvn qunit:test
 [INFO] Scanning for projects...
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Unnamed - com.cj.example:qunit-mojo-example:jar:0.0.1-SNAPSHOT
+[INFO] Building my-web-project - com.cj.example:my-web-project:jar:0.0.1-SNAPSHOT
 [INFO]    task-segment: [qunit:test]
 [INFO] ------------------------------------------------------------------------
 [INFO] [qunit:test {execution: default-cli}]
