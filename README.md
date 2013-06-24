@@ -55,12 +55,7 @@ Setup:
 ~~~~~ xml
 
 <project>
-    <modelVersion>4.0.0</modelVersion>
-    
-    <groupId>com.cj.example</groupId>
-    <artifactId>qunit-mojo-example</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-
+      --- SNIP ---
     <build>
         <plugins>
             <plugin>
