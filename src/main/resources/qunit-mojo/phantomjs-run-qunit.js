@@ -94,6 +94,25 @@ function versionCheck(){
                     });
                 }
             });
+
+            QUnit.log(function (assertion) {
+                if (false === assertion.result) {
+
+                    var failureMessage = "*** Assertion FAILED!! Test: [" + assertion.name + "]";
+
+                    if (assertion.message) {
+                        failureMessage += " Message: [" + assertion.message + "]";
+                    }
+
+                    if (assertion.expected) {
+                        failureMessage += " Expected: [" + assertion.expected + "] Actual: [" + assertion.actual + "]";
+                    }
+
+                    console.error(failureMessage);
+                }
+            });
+
         }, false);
+
     }
 })();
