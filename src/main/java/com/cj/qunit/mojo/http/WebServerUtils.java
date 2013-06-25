@@ -29,7 +29,7 @@ public class WebServerUtils {
         List<File> pathsToServe = new ArrayList<File>(codePaths);
         pathsToServe.addAll(extraPathsToServe);
         
-        List<HttpObject> resources = new ArrayList<HttpObject>(Arrays.asList(new TestListingResource("/", codePaths)));
+        List<HttpObject> resources = new ArrayList<HttpObject>(Arrays.asList(new TestListingResource("/", webRoot, codePaths)));
         
         for(File projectDirectory: pathsToServe){
             resources.add(new FilesystemResourcesObject(webRoot + "/{resource*}", projectDirectory));

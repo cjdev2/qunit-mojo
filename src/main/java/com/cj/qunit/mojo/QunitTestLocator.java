@@ -37,7 +37,7 @@ public class QunitTestLocator {
         return codePaths;
     }
 
-    public List<LocatedTest> locateTests(final File where){
+    public List<LocatedTest> locateTests(final File where, final String webRoot){
     	if(where==null) throw new NullPointerException();
     	
         final List<LocatedTest> results = new ArrayList<QunitTestLocator.LocatedTest>();
@@ -48,15 +48,26 @@ public class QunitTestLocator {
                 final String name = path.getName();
                 final String s = path.getAbsolutePath().replaceAll(Pattern.quote(where.getAbsolutePath()), "");
                 final String relativePath = s.startsWith("/")?s.substring(1):s;
+
+                final String root = stripLeadingSlash(webRoot);
                 
                 if(name.matches(".*Qunit.*\\.html")){
-                    results.add(new LocatedTest(relativePath, relativePath));
+                    results.add(new LocatedTest(relativePath, addTrailingSlashIfMissing(root) + relativePath));
                 }else if(name.endsWith(".qunit.js")){
                     results.add(new LocatedTest(relativePath, relativePath + ".Qunit.html"));
                 }
             }
+
         });
 
         return results;
+    }
+
+    private String addTrailingSlashIfMissing(String webRoot) {
+        return webRoot.endsWith("/") ? webRoot : webRoot + "/";
+    }
+
+    private String stripLeadingSlash(String webRoot) {
+        return webRoot.startsWith("/") ? webRoot.substring(1) : webRoot;
     }
 }

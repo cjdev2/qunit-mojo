@@ -11,9 +11,11 @@ import com.cj.qunit.mojo.QunitTestLocator;
 
 class TestListingResource extends HttpObject {
     private final List<File> paths;
+    private final String basePath;
     
-    public TestListingResource(String pathPattern, List<File> paths) {
+    public TestListingResource(String pathPattern, String basePath, List<File> paths) {
         super(pathPattern);
+        this.basePath = basePath;
         this.paths = paths;
     }
     
@@ -23,7 +25,7 @@ class TestListingResource extends HttpObject {
         StringBuffer html = new StringBuffer("<html><body><h1>Qunit Tests</h1>");
         
         for(File path: paths){
-            for(QunitTestLocator.LocatedTest test: new QunitTestLocator().locateTests(path)){
+            for(QunitTestLocator.LocatedTest test: new QunitTestLocator().locateTests(path, basePath)){
                 html.append("<div><a href=\"" + test.relativePath + "\">" + test.name + "</a></div>");
             }
         }

@@ -21,7 +21,7 @@ public class QunitMavenRunner {
         HTMLUNIT{
             String runTest(
                     final WebServerUtils.JettyPlusPort jetty,
-                    final QunitTestLocator.LocatedTest test,
+                    final LocatedTest test,
                     final String name,  int testTimeout,
                     final Listener listener) {
 
@@ -34,7 +34,7 @@ public class QunitMavenRunner {
             
             String runTest(
                     final WebServerUtils.JettyPlusPort jetty,
-                    final QunitTestLocator.LocatedTest test,
+                    final LocatedTest test,
                     final String name,  int testTimeout,
                     final Listener listener) {
                 
@@ -103,7 +103,7 @@ public class QunitMavenRunner {
         
         abstract String runTest(
                 final WebServerUtils.JettyPlusPort jetty,
-                final QunitTestLocator.LocatedTest test,
+                final LocatedTest test,
                 final String name,  int testTimeout,
                 final Listener listener);
         }
@@ -174,24 +174,25 @@ public class QunitMavenRunner {
 
             final List<String> problems = new ArrayList<String>(); 
             
-            final List<QunitTestLocator.LocatedTest> allTests = new ArrayList<QunitTestLocator.LocatedTest>();
+            
+            final List<LocatedTest> allTests = new ArrayList<LocatedTest>();
             
             for(File codePath : codePaths){
-                for(QunitTestLocator.LocatedTest test: new QunitTestLocator().locateTests(codePath)){
+                for(QunitTestLocator.LocatedTest test: new QunitTestLocator().locateTests(codePath, normalizedWebRoot)){
                      if(matches(test, filter)){
                          allTests.add(test);
                      }
                 }
             };
             
-            final List<QunitTestLocator.LocatedTest> testsRemaining = new ArrayList<QunitTestLocator.LocatedTest>(allTests);
+            final List<LocatedTest> testsRemaining = new ArrayList<LocatedTest>(allTests);
 
             log.initInfo("Executing qunit tests on " + numThreads + " thread(s) using " + runner.toString().toLowerCase());
             
             runInParallel(numThreads, new Runnable(){
                 public void run() {
                     while(true){
-                        final QunitTestLocator.LocatedTest test;
+                        final LocatedTest test;
                         synchronized(testsRemaining){
                             if(testsRemaining.size()>0){
                                 test = testsRemaining.get(0);
