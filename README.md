@@ -9,6 +9,12 @@ Goals:
 * qunit:test -> runs all your '*.qunit.js' files as qunit tests using phantomjs (or, optionally, qunit-test-driver)
 * qunit:serve -> starts an http server and serves your code so you can run it in the browser
 
+Options:
+
+* -Dqunit.numThreads=N -> executes qunit tests in parallel using N threads
+* -Dqunit.filter=foo -> executes only those tests which have 'foo' in their name/path
+
+
 Example:
 
 ~~~~~ javascript
