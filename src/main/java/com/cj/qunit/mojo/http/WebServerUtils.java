@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jetty.server.Server;
 import org.httpobjects.HttpObject;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.util.ClasspathResourcesObject;
 import org.httpobjects.util.FilesystemResourcesObject;
-import org.mortbay.jetty.Server;
 
 public class WebServerUtils {
 
