@@ -1,6 +1,9 @@
 package com.cj.qunit.mojo.http;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.httpobjects.HttpObject;
@@ -8,6 +11,7 @@ import org.httpobjects.Request;
 import org.httpobjects.Response;
 
 import com.cj.qunit.mojo.QunitTestLocator;
+import com.cj.qunit.mojo.QunitTestLocator.LocatedTest;;
 
 class TestListingResource extends HttpObject {
     private final List<File> paths;
@@ -22,16 +26,29 @@ class TestListingResource extends HttpObject {
     @Override
     public Response get(Request req) {
 
-        StringBuffer html = new StringBuffer("<html><body><h1>Qunit Tests</h1>");
-        
-        for(File path: paths){
-            for(QunitTestLocator.LocatedTest test: new QunitTestLocator().locateTests(path, basePath)){
-                html.append("<div><a href=\"" + test.relativePath + "\">" + test.name + "</a></div>");
+        List<LocatedTest> allTestFiles = findFiles();
+        Collections.sort(allTestFiles, new Comparator<LocatedTest>() {
+            @Override
+            public int compare(LocatedTest a, LocatedTest b) {
+                return a.relativePath.compareTo(b.relativePath);
             }
-        }
+        });
         
+        StringBuffer html = new StringBuffer("<html><body><h1>Qunit Tests</h1>");
+        for(LocatedTest test : allTestFiles){
+            html.append("<div><a href=\"" + test.relativePath + "\">" + test.name + "</a></div>");
+        }
         html.append("</body></html");
         
         return OK(Html(html.toString()));
+    }
+
+    private List<LocatedTest> findFiles() {
+        List<LocatedTest> allTestFiles = new ArrayList<LocatedTest>();
+        
+        for(File path: paths){
+            allTestFiles.addAll(new QunitTestLocator().locateTests(path, basePath));
+        }
+        return allTestFiles;
     }
 }
