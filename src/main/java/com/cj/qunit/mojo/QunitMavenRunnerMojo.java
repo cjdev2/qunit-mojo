@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.maven.plugin.MojoFailureException;
 
 import com.cj.qunit.mojo.QunitMavenRunner.Runner;
+import com.cj.qunit.mojo.jetty.JettyMavenLogger;
 
 /**
  * @phase test
@@ -49,6 +50,7 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
                 getLog().info(info);
             }
         };
+
         
         final Runner runner = Runner.valueOf(this.runner.toUpperCase());
         
@@ -59,7 +61,8 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
                                             extraPathsToServe(), 
                                             webPathToRequireDotJsConfig(), 
                                             listener, 
-                                            returnTimeout());
+                                            returnTimeout(),
+                                            new JettyMavenLogger("foobar", getLog()));
         
         if(!problems.isEmpty()){
             StringBuffer problemsString = new StringBuffer();

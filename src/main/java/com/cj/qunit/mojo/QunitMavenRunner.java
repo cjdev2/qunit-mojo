@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jetty.util.log.Logger;
 
 import com.cj.qunit.mojo.QunitTestLocator.LocatedTest;
 import com.cj.qunit.mojo.http.WebServerUtils;
@@ -150,11 +151,7 @@ public class QunitMavenRunner {
         return result;
     }
     
-    public List<String> run(final String webRoot, final List<File> codePaths, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Listener log, final int testTimeout) {
-        return this.run(webRoot, codePaths, null, extraPathsToServe, webPathToRequireDotJsConfig, log, testTimeout);
-    }
-    
-    public List<String> run(final String webRoot, final List<File> codePaths, final String filter, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Listener log, final int testTimeout) {
+    public List<String> run(final String webRoot, final List<File> codePaths, final String filter, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Listener log, final int testTimeout, Logger jettyLog) {
         final String requireDotJsConfig;
 
         final String normalizedWebRoot = normalizedWebRoot(webRoot);
@@ -168,7 +165,7 @@ public class QunitMavenRunner {
 
         validateJsConfigpath(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig);
 
-        final WebServerUtils.JettyPlusPort jetty = WebServerUtils.launchHttpServer(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig);
+        final WebServerUtils.JettyPlusPort jetty = WebServerUtils.launchHttpServer(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig, jettyLog);
 
         try{
 

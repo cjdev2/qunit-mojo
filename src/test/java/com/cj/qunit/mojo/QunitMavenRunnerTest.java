@@ -11,6 +11,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.junit.Test;
 
 import com.cj.qunit.mojo.QunitMavenRunner;
@@ -56,7 +57,7 @@ public class QunitMavenRunnerTest {
             List<String> problems;
             Exception t;
             try {
-                problems = runner.run("", Collections.singletonList(projectDirectory), filter, Collections.<File>emptyList(), "", log, 5000);
+                problems = runner.run("", Collections.singletonList(projectDirectory), filter, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
                 t = null;
             } catch (Exception e) {
                 t = e;
@@ -88,7 +89,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Exception t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), Collections.<File>emptyList(), "", log, 5000);
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
             t = null;
         } catch (Exception e) {
             t = e;
@@ -138,7 +139,8 @@ public class QunitMavenRunnerTest {
                                   Arrays.asList(
                                             new File(projectDirectory, "src/main/whatever"),
                                             new File(projectDirectory, "src/test/whatever")),
-                                  Collections.<File>emptyList(), "/path/to/my/app/my-require-config.js", log, 5000);
+                                  null,
+                                  Collections.<File>emptyList(), "/path/to/my/app/my-require-config.js", log, 5000, new JavaUtilLog());
             t = null;
         } catch (Exception e) {
             t = e;
@@ -188,7 +190,8 @@ public class QunitMavenRunnerTest {
                                       Arrays.asList(
                                                 new File(projectDirectory, "src/main/whatever"),
                                                 new File(projectDirectory, "src/test/whatever")), 
-                                      Collections.<File>emptyList(), nullPath, log, 5000);
+                                      null,
+                                      Collections.<File>emptyList(), nullPath, log, 5000, new JavaUtilLog());
                 t = null;
             } catch (Exception e) {
                 t = e;
@@ -220,7 +223,7 @@ public class QunitMavenRunnerTest {
         // when
         Exception err;
         try {
-            runner.run("", Collections.singletonList(projectDirectory), Collections.<File>emptyList(), "/some-nonexistent-file.js", log, 5000);
+            runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "/some-nonexistent-file.js", log, 5000, new JavaUtilLog());
             err = null;
         } catch (Exception e) {
             err = e;
@@ -250,7 +253,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Exception t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), Collections.<File>emptyList(), "", log, 5000);
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
             t = null;
         } catch (Exception e) {
             t = e;
@@ -284,7 +287,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Exception t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), Collections.<File>emptyList(), "", log, 5000);
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
             t = null;
         } catch (Exception e) {
             t = e;
@@ -318,7 +321,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Throwable t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), Collections.<File>emptyList(), "", log, 5000);
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
             t = null;
         } catch (Throwable e) {
             t = e;

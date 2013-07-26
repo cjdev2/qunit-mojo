@@ -3,16 +3,25 @@ package com.cj.qunit.mojo.http;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.plugin.logging.Log;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.log.Logger;
 import org.httpobjects.HttpObject;
 import org.httpobjects.jetty.HttpObjectsJettyHandler;
 import org.httpobjects.util.ClasspathResourcesObject;
 import org.httpobjects.util.FilesystemResourcesObject;
 
-public class WebServerUtils {
+import com.cj.qunit.mojo.jetty.JettyMavenLogger;
 
+public class WebServerUtils {
+    
+    public static void main(String[] args) {
+        launchHttpServer("", Collections.<File>emptyList(), Collections.<File>emptyList(), "", null);
+    }
+    
     public static class JettyPlusPort {
         public final int port;
         public final Server server;
@@ -24,7 +33,11 @@ public class WebServerUtils {
 
     }
 
-    public static JettyPlusPort launchHttpServer(final String webRoot, final List<File> codePaths, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig ) {
+    public static JettyPlusPort launchHttpServer(final String webRoot, final List<File> codePaths, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Logger log) {
+
+        if(log!=null){
+            org.eclipse.jetty.util.log.Log.setLog(log);
+        }
         
         List<File> pathsToServe = new ArrayList<File>(codePaths);
         pathsToServe.addAll(extraPathsToServe);
