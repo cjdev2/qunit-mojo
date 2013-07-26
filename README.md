@@ -67,7 +67,7 @@ Setup:
             <plugin>
                 <groupId>com.cj.qunit.mojo</groupId>
                 <artifactId>qunit-maven-plugin</artifactId>
-                <version>2.0.3</version>
+                <version>2.0.4</version>
                 <executions>
                     <execution>
                         <phase>test</phase>
