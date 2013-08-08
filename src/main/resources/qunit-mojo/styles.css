@@ -1,0 +1,44 @@
+
+.test-directory {
+	margin-left: 20px;
+	padding:5px;
+	font-family: sans-serif;
+	font-style: italic;
+	text-decoration: none;
+	border-bottom: 2px solid grey;
+	padding-top: 30px;
+	margin-bottom: 20px;
+}
+
+.test-file {
+	padding:5px;
+	margin-left: 40px;
+	color: #4C4C4D;
+	font-family: sans-serif;
+}
+
+a:visited, a:link, .test-directory {
+	color: #4C4C4D;
+	text-decoration: none;
+}
+
+a:hover{
+	cursor:pointer;
+	text-decoration: underline;
+}
+
+.all-files-link {
+	    margin-bottom: 5px;
+		display: block;
+		border-radius: 5px;
+		padding: 0.5em 0 0.5em 1em;
+		color: #FDFEFF;
+		background-color: #6C7D86;
+		font-size: 1.5em;
+		line-height: 1em;
+		font-weight: normal;
+		text-decoration: none;
+		font-family: sans-serif;
+    }
+    
+    
