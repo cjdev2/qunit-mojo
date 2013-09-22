@@ -29,6 +29,16 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
      */
     public String filterPattern;
     
+    /**
+     * @parameter expression="${qunit.verbose}" default-value=false
+     */
+    public Boolean verbose;
+
+    /**
+     * @parameter expression="${qunit.preserveTempFiles}" default-value=false
+     */
+    public Boolean preserveTempFiles;
+
     public void execute() throws MojoFailureException {
         if(shouldSkipTests()) return;
         
@@ -36,25 +46,37 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
         
         final List<String> filesRun = new ArrayList<String>();
         final QunitMavenRunner.Listener listener = new QunitMavenRunner.Listener() {
+
+            String maybePrependThreadName(String s) {
+                return verbose ? "[" + Thread.currentThread().getName() + "] " + s : s;
+            }
+
             @Override
-            public void runningTest(String relativePath) {
-                getLog().info("Running: " + relativePath);
+            public synchronized void runningTest(String relativePath) {
+                String message = "Running: " + relativePath;
+                getLog().info(maybePrependThreadName(message));
                 filesRun.add(relativePath);
             }
             @Override
-            public void debug(String info) {
-                getLog().debug(info);
+            public synchronized void debug(String info) {
+                getLog().debug(maybePrependThreadName(info));
             }
+
             @Override
-            public void initInfo(String info) {
-                getLog().info(info);
+            public synchronized void warn(String info) {
+                getLog().warn(maybePrependThreadName(info));
+            }
+
+            @Override
+            public synchronized void info(String info) {
+                getLog().info(maybePrependThreadName(info));
             }
         };
 
         
         final Runner runner = Runner.valueOf(this.runner.toUpperCase());
         
-        final List<String> problems = new QunitMavenRunner(numThreads, runner).run(
+        final List<String> problems = new QunitMavenRunner(numThreads, runner, verbose, preserveTempFiles).run(
                                             webRoot(), 
                                             codePaths(), 
                                             filterPattern,
@@ -65,7 +87,7 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
                                             new JettyMavenLogger("foobar", getLog()));
         
         if(!problems.isEmpty()){
-            StringBuffer problemsString = new StringBuffer();
+            StringBuilder problemsString = new StringBuilder();
             
             for(String next : problems){
                 problemsString.append(next);

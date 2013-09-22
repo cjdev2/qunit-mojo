@@ -352,9 +352,13 @@ public class QunitMavenRunnerTest {
         @Override
         public void debug(String info) {
         }
-        
+
         @Override
-        public void initInfo(String info) {
+        public void warn(String info) {
+        }
+
+        @Override
+        public void info(String info) {
         }
         
     }
