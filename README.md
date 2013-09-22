@@ -13,6 +13,8 @@ Options:
 
 * -Dqunit.numThreads=N -> executes qunit tests in parallel using N threads
 * -Dqunit.filter=foo -> executes only those tests which have 'foo' in their name/path
+* -Dqunit.verbose=true/false -> logs verbose output for debugging (default=false)
+* -Dqunit.preserveTempFiles=true/false -> preserves generated temp files for with debugging (default=false)
 
 
 Example:
@@ -67,7 +69,7 @@ Setup:
             <plugin>
                 <groupId>com.cj.qunit.mojo</groupId>
                 <artifactId>qunit-maven-plugin</artifactId>
-                <version>2.0.4</version>
+                <version>2.0.5</version>
                 <executions>
                     <execution>
                         <phase>test</phase>
