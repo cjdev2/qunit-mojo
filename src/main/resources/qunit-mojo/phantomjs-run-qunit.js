@@ -85,7 +85,9 @@ function versionCheck(){
     function watchForFinishedTests() {
         window.document.addEventListener('DOMContentLoaded', function () {
             QUnit.done(function (result) {
-                console.log('Tests run: ' + result.total + ', Passed: ' + result.passed + ', Failures: ' + result.failed + ', Time elapsed: ' + result.runtime + " ms" + (result.failed ? " <<< FAILURE!" : ""));
+                var isFailure = (result.total === 0 || result.failed);
+
+                console.log('Tests run: ' + result.total + ', Passed: ' + result.passed + ', Failures: ' + result.failed + ', Time elapsed: ' + result.runtime + " ms" + (isFailure ? " <<< FAILURE!" : ""));
 
                 if (typeof window.callPhantom === 'function') {
                     window.callPhantom({
