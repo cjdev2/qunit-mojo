@@ -47,6 +47,22 @@ public class QunitTestLocatorTest {
         assertEquals("foo/bar/somedir/Whatever.Qunit.html", results.get(0).relativePath);
     }
 
+    @Test
+    public void worksWithCoffeescript() {
+
+        // given
+        File dir = tempDirectory();
+
+        write(dir, "somedir/Whatever.qunit.coffee", "dummy content");
+        QunitTestLocator locator = new QunitTestLocator();
+
+        // when
+        List<LocatedTest> results = locator.locateTests(dir, "/foo/bar/");
+
+        // then
+        assertEquals(1, results.size());
+        assertEquals("somedir/Whatever.qunit.coffee.Qunit.html", results.get(0).relativePath);
+    }
 
     private static void write(File baseDir, String path, String content){
         try {

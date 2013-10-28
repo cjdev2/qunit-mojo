@@ -55,6 +55,8 @@ public class QunitTestLocator {
                     results.add(new LocatedTest(relativePath, addTrailingSlashIfMissing(root) + relativePath));
                 }else if(name.endsWith(".qunit.js")){
                     results.add(new LocatedTest(relativePath, relativePath + ".Qunit.html"));
+                }else if(name.endsWith(".qunit.coffee")){
+                    results.add(new LocatedTest(relativePath, relativePath + ".Qunit.html"));
                 }
             }
 

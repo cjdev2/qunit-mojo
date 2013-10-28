@@ -267,7 +267,38 @@ public class QunitMavenRunnerTest {
         Assert.assertEquals(1, log.pathsRun.size());
         Assert.assertEquals("src/test/whatever/Whatever.qunit.js", log.pathsRun.get(0));
     }
-    
+
+
+    @Test
+    public void findsTestCoffeescriptFilesUnderTheSrcTestDirectory() throws Exception {
+        // given
+        File projectDirectory = tempDirectory();
+        File srcMainHtmlDirectory = new File(projectDirectory, "src/test/whatever");
+        srcMainHtmlDirectory.mkdirs();
+
+        FileUtils.writeStringToFile(new File(srcMainHtmlDirectory, "Whatever.qunit.coffee"), "test 'mytest', -> ok(true) \n");
+
+        QunitMavenRunner runner = new QunitMavenRunner();
+        FakeLog log = new FakeLog();
+
+        // when
+        List<String> problems;
+        Exception t;
+        try {
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
+            t = null;
+        } catch (Exception e) {
+            t = e;
+            problems = Collections.emptyList();
+        }
+
+        // then
+        System.out.println(srcMainHtmlDirectory.getAbsolutePath());
+        Assert.assertTrue("The plugin should not blow up", t == null);
+        Assert.assertEquals(0, problems.size());
+        Assert.assertEquals(1, log.pathsRun.size());
+        Assert.assertEquals("src/test/whatever/Whatever.qunit.coffee", log.pathsRun.get(0));
+    }
     
     @Test
     public void findsQunitHtmlFilesUnderTheSrcTestDirectory() throws Exception {
