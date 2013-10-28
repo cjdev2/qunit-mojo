@@ -6,7 +6,7 @@ A maven plugin for quickly and easily creating, refactoring and running qunit te
 
 Goals:
 
-* qunit:test -> runs all your '*.qunit.js' files as qunit tests using phantomjs (or, optionally, qunit-test-driver)
+* qunit:test -> runs all your '\*.qunit.js' or '\*.qunit.coffee' files as qunit tests using phantomjs (or, optionally, qunit-test-driver)
 * qunit:serve -> starts an http server and serves your code so you can run it in the browser
 
 Options:
@@ -69,7 +69,7 @@ Setup:
             <plugin>
                 <groupId>com.cj.qunit.mojo</groupId>
                 <artifactId>qunit-maven-plugin</artifactId>
-                <version>2.0.5</version>
+                <version>2.0.6</version>
                 <executions>
                     <execution>
                         <phase>test</phase>
@@ -83,3 +83,8 @@ Setup:
     </build>
 </project>
 ~~~~~
+
+Notes:
+
+* coffeescript support is provided by the require-cs plugin. 
+    * If not using the default require config then you will need to make sure the plugin is available under the default 'cs' path. 
