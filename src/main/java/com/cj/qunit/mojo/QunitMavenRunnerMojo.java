@@ -42,7 +42,7 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
     /**
      * @parameter expression="${qunit.retryCount}"
      */
-    public Integer retryCount = 0;
+    public Integer retryCount = 1;
 
     public void execute() throws MojoFailureException {
         if(shouldSkipTests()) return;
