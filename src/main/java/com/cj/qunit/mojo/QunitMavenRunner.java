@@ -26,7 +26,8 @@ public class QunitMavenRunner {
                     final String name,  int testTimeout,
                     final Listener listener,
                     boolean verbose,
-                    boolean preserveTempFiles) {
+                    boolean preserveTempFiles,
+                    int retryCount) {
 
                 QUnitTestPage page = new QUnitTestPage(jetty.port, test.relativePath, testTimeout, BrowserVersion.FIREFOX_17, true);
                 page.assertTestsPass();
@@ -41,40 +42,51 @@ public class QunitMavenRunner {
                     final String name,  int testTimeout,
                     final Listener listener,
                     boolean verbose,
-                    boolean preserveTempFiles) {
+                    boolean preserveTempFiles,
+                    int retryCount) {
                 
                 try {
-                    File f = File.createTempFile("phantomjs-run-qunit", ".js");
+                    String message = null;
+                    for (int run = 0; run <= retryCount; run++) {
+                        File f = File.createTempFile("phantomjs-run-qunit", ".js");
 
-                    if (!preserveTempFiles) { f.deleteOnExit(); }
+                        if (!preserveTempFiles) { f.deleteOnExit(); }
 
-                    FileUtils.write(f, IOUtils.toString(getClass().getResourceAsStream("/qunit-mojo/phantomjs-run-qunit.js")));
+                        FileUtils.write(f, IOUtils.toString(getClass().getResourceAsStream("/qunit-mojo/phantomjs-run-qunit.js")));
                     
-                    String baseUrl = "http://localhost:" + jetty.port;
-                    String url = baseUrl + "/" + test.relativePath;
-                    String[] command = {
-                            "phantomjs",
-                            f.getAbsolutePath(),
-                            url,
-                            Integer.toString(testTimeout)};
+                        String baseUrl = "http://localhost:" + jetty.port;
+                        String url = baseUrl + "/" + test.relativePath;
+                        String[] command = {
+                                "phantomjs",
+                                f.getAbsolutePath(),
+                                url,
+                                Integer.toString(testTimeout)};
                     
-                    Process phantomjs = new ProcessBuilder().redirectErrorStream(true).command(command).start();
+                        Process phantomjs = new ProcessBuilder().redirectErrorStream(true).command(command).start();
 
-                    String logMessage = "Executing " + mkString(command, " ");
+                        String logMessage = "Executing " + mkString(command, " ");
 
-                    if (verbose) { listener.info(logMessage); } else { listener.debug(logMessage); }
+                        if (verbose) { listener.info(logMessage); } else { listener.debug(logMessage); }
                     
-                    copyStreamAsyncOneByteAtATime(phantomjs.getInputStream(), System.out);
-                    copyStreamAsyncOneByteAtATime(phantomjs.getErrorStream(), System.err);
+                        copyStreamAsyncOneByteAtATime(phantomjs.getInputStream(), System.out);
+                        copyStreamAsyncOneByteAtATime(phantomjs.getErrorStream(), System.err);
                     
-                    final int exitCode = phantomjs.waitFor();
+                        final int exitCode = phantomjs.waitFor();
 
-                    logMessage = "Exit code " + exitCode + " for " + name;
+                        logMessage = "Exit code " + exitCode + " for " + name;
                     
-                    if (verbose) { listener.info(logMessage); } else { listener.debug(logMessage); }
+                        if (verbose) { listener.info(logMessage); } else { listener.debug(logMessage); }
 
-                    return (exitCode == 0) ? null : "Problems found in " + name;
-
+                        if (exitCode == 0) {
+                            return null;
+                        }
+                        if (exitCode < 128) {
+                            return "Problems found in " + name;
+                        }
+                        // apparently when exitCode is >128 phantomjs crashed with error exitCode-128  (e.g. 139-128=11 or SIGSEGV)
+                        message = "Problems found in " + name + " (Crash? " + exitCode + ")";
+                    }
+                    return message;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -115,8 +127,9 @@ public class QunitMavenRunner {
                 final String name,  int testTimeout,
                 final Listener listener,
                 boolean verbose,
-                boolean preserveTempFiles);
-        }
+                boolean preserveTempFiles,
+                int retryCount);
+    }
     
     public static interface Listener {
         void warn(String info);
@@ -139,17 +152,19 @@ public class QunitMavenRunner {
     final Runner runner;
     final boolean verbose;
     final boolean preserveTempFiles;
+    final int retryCount;
 
     public QunitMavenRunner() {
-        this(1, Runner.HTMLUNIT, false, false);
+        this(1, Runner.HTMLUNIT, false, false, 0);
     }
     
-    public QunitMavenRunner(int numThreads, Runner runner, boolean verbose, boolean preserveTempFiles) {
+    public QunitMavenRunner(int numThreads, Runner runner, boolean verbose, boolean preserveTempFiles, int retryCount) {
         super();
         this.numThreads = numThreads;
         this.runner = runner;
         this.verbose = verbose;
         this.preserveTempFiles = preserveTempFiles;
+        this.retryCount = retryCount;
     }
     
     public boolean matches(final LocatedTest test, final String filterRegex) {
@@ -227,7 +242,7 @@ public class QunitMavenRunner {
 
                         String problem = null;
                         try {
-                            problem = runner.runTest(jetty, test, name, testTimeout, log, verbose, preserveTempFiles);
+                            problem = runner.runTest(jetty, test, name, testTimeout, log, verbose, preserveTempFiles, retryCount);
                         } catch (Throwable m){
                             problem = "Problems found in '" + name +"':\n"+m.getMessage();
                         }   

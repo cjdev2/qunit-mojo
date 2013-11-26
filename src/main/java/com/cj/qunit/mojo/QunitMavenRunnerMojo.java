@@ -39,6 +39,11 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
      */
     public Boolean preserveTempFiles;
 
+    /**
+     * @parameter expression="${qunit.retryCount}"
+     */
+    public Integer retryCount = 0;
+
     public void execute() throws MojoFailureException {
         if(shouldSkipTests()) return;
         
@@ -76,7 +81,7 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
         
         final Runner runner = Runner.valueOf(this.runner.toUpperCase());
         
-        final List<String> problems = new QunitMavenRunner(numThreads, runner, verbose, preserveTempFiles).run(
+        final List<String> problems = new QunitMavenRunner(numThreads, runner, verbose, preserveTempFiles, retryCount).run(
                                             webRoot(), 
                                             codePaths(), 
                                             filterPattern,
