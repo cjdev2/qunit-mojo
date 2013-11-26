@@ -15,6 +15,7 @@ Options:
 * -Dqunit.filter=foo -> executes only those tests which have 'foo' in their name/path
 * -Dqunit.verbose=true/false -> logs verbose output for debugging (default=false)
 * -Dqunit.preserveTempFiles=true/false -> preserves generated temp files for with debugging (default=false)
+* -Dqunit.retryCount=N -> how many times to retry a test when phantomjs crashes (default=1)
 
 
 Example:
