@@ -27,6 +27,7 @@ function versionCheck(){
     
     
     url = args[1];
+    url = url.replace(/\\/g,'/');
     page = require('webpage').create();
     if (args[2] !== undefined) {
         timeout = parseInt(args[2], 10);
