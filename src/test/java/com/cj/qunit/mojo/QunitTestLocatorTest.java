@@ -89,7 +89,7 @@ public class QunitTestLocatorTest {
         assertEquals("foo/bar/somedir/Whatever.qunit", result.requireJsModuleName);
         assertEquals(new File(dir, "somedir/Whatever.qunit.js"), result.pathOnDisk);
     }
-    
+       
     @Test
     public void theMostSpecificBaseDirWins() {
 
@@ -114,6 +114,30 @@ public class QunitTestLocatorTest {
         assertEquals(new File(dir, "somedir/Whatever.qunit.js"), result.pathOnDisk);
     }
     
+    
+    @Test
+    public void theMostSpecificBaseDirWinsForHandcodedFiles() {
+
+        // given
+        File dir = tempDirectory();
+
+        write(dir, "somedir/WhateverQunitTest.html", "dummy content");
+        QunitTestLocator locator = new QunitTestLocator();
+        
+        List<File> dirs = Arrays.asList(
+                                dir,
+                                new File(dir, "somedir"));
+        
+        // when
+        List<LocatedTest> results = locator.locateTests(dirs, "/foo/bar/", "");
+
+        // then
+        assertEquals(1, results.size());
+        LocatedTest result = results.get(0);
+        assertEquals("foo/bar/WhateverQunitTest.html", result.relativePathToHtmlFile);
+        assertEquals(null, result.requireJsModuleName);
+        assertEquals(new File(dir, "somedir/WhateverQunitTest.html"), result.pathOnDisk);
+    }
     
     @Test
     public void worksWithJavascript() {
