@@ -55,6 +55,11 @@
             <artifactId>httpobjects-jetty-7-and-8</artifactId>
             <version>0.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>1.7R3</version>
+        </dependency>
     </dependencies>
 
     <!-- BEGIN: STUFF REQUIRED BY THE CENTRAL REPO -->

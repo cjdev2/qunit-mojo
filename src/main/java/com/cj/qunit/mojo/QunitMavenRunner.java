@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -12,7 +13,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.util.log.Logger;
 
-import com.cj.qunit.mojo.QunitTestLocator.LocatedTest;
 import com.cj.qunit.mojo.http.WebServerUtils;
 import com.cj.qunitTestDriver.QUnitTestPage;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -21,7 +21,7 @@ public class QunitMavenRunner {
     public enum Runner{
         HTMLUNIT{
             String runTest(
-                    final WebServerUtils.JettyPlusPort jetty,
+                    final WebServerUtils.JettyPlusPortPlusScanner jetty,
                     final LocatedTest test,
                     final String name,  int testTimeout,
                     final Listener listener,
@@ -29,7 +29,7 @@ public class QunitMavenRunner {
                     boolean preserveTempFiles,
                     int retryCount) {
 
-                QUnitTestPage page = new QUnitTestPage(jetty.port, test.relativePath, testTimeout, BrowserVersion.FIREFOX_17, true);
+                QUnitTestPage page = new QUnitTestPage(jetty.port, test.relativePathToHtmlFile, testTimeout, BrowserVersion.FIREFOX_17, true);
                 page.assertTestsPass();
                 return null;
             }
@@ -37,7 +37,7 @@ public class QunitMavenRunner {
         PHANTOMJS{
             
             String runTest(
-                    final WebServerUtils.JettyPlusPort jetty,
+                    final WebServerUtils.JettyPlusPortPlusScanner jetty,
                     final LocatedTest test,
                     final String name,  int testTimeout,
                     final Listener listener,
@@ -55,7 +55,7 @@ public class QunitMavenRunner {
                         FileUtils.write(f, IOUtils.toString(getClass().getResourceAsStream("/qunit-mojo/phantomjs-run-qunit.js")));
                     
                         String baseUrl = "http://localhost:" + jetty.port;
-                        String url = baseUrl + "/" + test.relativePath;
+                        String url = baseUrl + "/" + test.relativePathToHtmlFile;
                         String[] command = {
                                 "phantomjs",
                                 f.getAbsolutePath(),
@@ -122,7 +122,7 @@ public class QunitMavenRunner {
         }
         
         abstract String runTest(
-                final WebServerUtils.JettyPlusPort jetty,
+                final WebServerUtils.JettyPlusPortPlusScanner jetty,
                 final LocatedTest test,
                 final String name,  int testTimeout,
                 final Listener listener,
@@ -166,18 +166,24 @@ public class QunitMavenRunner {
         this.preserveTempFiles = preserveTempFiles;
         this.retryCount = retryCount;
     }
-    
-    public boolean matches(final LocatedTest test, final String filterRegex) {
-        final boolean result;
-        if(filterRegex==null){
-            result = true;
-        }else if(filterRegex.startsWith("regex:")){
-            final String patternText = filterRegex.replaceFirst("regex:", "");
-            result = Pattern.compile(patternText).matcher(test.name).matches();
-        }else{
-            result = test.name.contains(filterRegex);
+        
+    public static String requireConfigBaseUrl(String webPathToRequireDotJsConfig, int port){
+        
+        try {
+        	
+            if(webPathToRequireDotJsConfig == null || webPathToRequireDotJsConfig.isEmpty()) return "";
+            
+            final String code = IOUtils.toString(new URL("http://localhost:" + port + webPathToRequireDotJsConfig).openStream());
+            Rhino rhino = new Rhino();
+            rhino.eval(code);
+            final String result = rhino.eval("require.baseUrl");
+            final String baseUrl =  result == null ? "" : result;
+            System.out.println("baseUrl is " + baseUrl);
+            return baseUrl;
+            
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return result;
     }
     
     public List<String> run(final String webRoot, final List<File> codePaths, final String filter, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Listener log, final int testTimeout, Logger jettyLog) {
@@ -193,25 +199,25 @@ public class QunitMavenRunner {
 
 
         validateJsConfigpath(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig);
-
-        final WebServerUtils.JettyPlusPort jetty = WebServerUtils.launchHttpServer(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig, jettyLog);
+        final WebServerUtils.JettyPlusPortPlusScanner jetty = WebServerUtils.launchHttpServer(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig, jettyLog, true);
 
         try{
 
             final List<String> problems = new ArrayList<String>(); 
 
+            final List<File> allPaths = new ArrayList<File>(codePaths);
+            allPaths.addAll(extraPathsToServe);
+            
             final List<LocatedTest> allTests = new ArrayList<LocatedTest>();
             
-            for(File codePath : codePaths){
-                for(QunitTestLocator.LocatedTest test: new QunitTestLocator().locateTests(codePath, normalizedWebRoot)){
-                     if(matches(test, filter)){
-                         allTests.add(test);
+            for(LocatedTest test: jetty.scanner.findTests()){
+                 if(test.matchesFilter(filter)){
+                     allTests.add(test);
 
-                         if (verbose) {
-                             log.info("found test file: " + test.name);
-                         }
+                     if (verbose) {
+                         log.info("found test file: " + test.relativePathToDetectedFile);
                      }
-                }
+                 }
             }
 
             if (verbose) {
@@ -237,14 +243,14 @@ public class QunitMavenRunner {
                             break;
                         }
 
-                        final String name = test.name;
-                        log.runningTest(name);
+                        final String relativePathToDetectedFile = test.relativePathToDetectedFile;
+                        log.runningTest(relativePathToDetectedFile);
 
                         String problem = null;
                         try {
-                            problem = runner.runTest(jetty, test, name, testTimeout, log, verbose, preserveTempFiles, retryCount);
+                            problem = runner.runTest(jetty, test, relativePathToDetectedFile, testTimeout, log, verbose, preserveTempFiles, retryCount);
                         } catch (Throwable m){
-                            problem = "Problems found in '" + name +"':\n"+m.getMessage();
+                            problem = "Problems found in '" + relativePathToDetectedFile +"':\n"+m.getMessage();
                         }   
 
                         if(problem!=null){
@@ -274,7 +280,6 @@ public class QunitMavenRunner {
         List<Thread> threads = new ArrayList<Thread>();
 
         for(int x=0;x<numThreads;x++){
-
             Thread t = new Thread("qunit-test-runner-" + x){
                 @Override
                 public void run() {
@@ -282,10 +287,8 @@ public class QunitMavenRunner {
                 }
 
             };
-
             threads.add(t);
             t.start();
-
         }
         
         for(Thread t : threads){

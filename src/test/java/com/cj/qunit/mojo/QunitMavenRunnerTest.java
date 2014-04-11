@@ -244,7 +244,9 @@ public class QunitMavenRunnerTest {
         File srcMainHtmlDirectory = new File(projectDirectory, "src/test/whatever");
         srcMainHtmlDirectory.mkdirs();
         
-        FileUtils.writeStringToFile(new File(srcMainHtmlDirectory, "Whatever.qunit.js"), "module('mytests');test('mytest', function(){ok(true);});");
+        FileUtils.writeStringToFile(new File(srcMainHtmlDirectory, "Whatever.qunit.js"), 
+        									"module('mytests');" +
+        									"test('mytest', function(){ok(true);});");
         
         QunitMavenRunner runner = new QunitMavenRunner();
         FakeLog log = new FakeLog();
@@ -263,6 +265,9 @@ public class QunitMavenRunnerTest {
         // then
         System.out.println(srcMainHtmlDirectory.getAbsolutePath());
         Assert.assertTrue("The plugin should not blow up", t == null);
+        for(String problem: problems){
+            System.out.println("PROBLEM: " + problem);
+        }
         Assert.assertEquals(0, problems.size());
         Assert.assertEquals(1, log.pathsRun.size());
         Assert.assertEquals("src/test/whatever/Whatever.qunit.js", log.pathsRun.get(0));
@@ -295,6 +300,9 @@ public class QunitMavenRunnerTest {
         // then
         System.out.println(srcMainHtmlDirectory.getAbsolutePath());
         Assert.assertTrue("The plugin should not blow up", t == null);
+        for(String problem : problems){
+        	System.out.println("PROBLEM: " + problem);
+        }
         Assert.assertEquals(0, problems.size());
         Assert.assertEquals(1, log.pathsRun.size());
         Assert.assertEquals("src/test/whatever/Whatever.qunit.coffee", log.pathsRun.get(0));
@@ -357,6 +365,7 @@ public class QunitMavenRunnerTest {
         } catch (Throwable e) {
             t = e;
             problems = Collections.emptyList();
+            t.printStackTrace();
         }
         
         // then
@@ -366,7 +375,7 @@ public class QunitMavenRunnerTest {
         
         Assert.assertEquals(1, problems.size());
         String problem = problems.get(0);
-        
+        System.out.println("PROBLEM: " + problem);
         Assert.assertTrue(problem.startsWith("Problems found in 'src/test/html/SomeFailingQunitTest.html'"));
         Assert.assertTrue(problem.contains("module with failing test in it: this test left intentionally failing"));
         Assert.assertTrue(problem.contains("0 assertions of 1 passed, 1 failed"));

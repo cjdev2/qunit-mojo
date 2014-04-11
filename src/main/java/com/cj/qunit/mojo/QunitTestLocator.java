@@ -1,70 +1,123 @@
 package com.cj.qunit.mojo;
 
-import static com.cj.qunit.mojo.fs.FilesystemFunctions.scanFiles;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.cj.qunit.mojo.fs.FilesystemFunctions.FileVisitor;
-
 public class QunitTestLocator {
-    public static class LocatedTest {
-        public final String name;
-        public final String relativePath;
-
-        private LocatedTest(String name, String relativePath) {
-            super();
-            this.name = name;
-            this.relativePath = relativePath;
-        }
-
-    }
-
+    public enum TestType {JAVASCRIPT, COFFEESCRIPT, HANDCRAFTEDHTML}
+    
     public static List<File> findCodePaths(File basedir) {
         List<File> codePaths = new ArrayList<File>();
         File sourceDir = new File(basedir, "src");
         if(sourceDir.exists()){
-	        for(File next : new File(basedir, "src").listFiles()){
-	            if(next.isDirectory()){
-	                codePaths.addAll(Arrays.asList(next.listFiles()));
-	            }
-	        }
-		}
-	
-        return codePaths;
-    }
-
-    public List<LocatedTest> locateTests(final File where, final String webRoot){
-    	if(where==null) throw new NullPointerException();
-    	
-        final List<LocatedTest> results = new ArrayList<QunitTestLocator.LocatedTest>();
-
-        scanFiles(where, new FileVisitor(){
-            @Override
-            public void visit(File path) {
-                final String name = path.getName();
-                final String s = path.getAbsolutePath().replaceAll(Pattern.quote(where.getAbsolutePath()), "");
-                final String relativePath = s.startsWith("/")?s.substring(1):s;
-
-                final String root = stripLeadingSlash(webRoot);
-                
-                if(name.matches(".*Qunit.*\\.html")){
-                    results.add(new LocatedTest(relativePath, addTrailingSlashIfMissing(root) + relativePath));
-                }else if(name.endsWith(".qunit.js")){
-                    results.add(new LocatedTest(relativePath, relativePath + ".Qunit.html"));
-                }else if(name.endsWith(".qunit.coffee")){
-                    results.add(new LocatedTest(relativePath, relativePath + ".Qunit.html"));
+            for(File next : new File(basedir, "src").listFiles()){
+                if(next.isDirectory()){
+                    codePaths.addAll(Arrays.asList(next.listFiles()));
                 }
             }
+        }
+    
+        return codePaths;
+    }
+    
+    private String normalizedWebRoot(final String webRoot) {
+        return webRoot.endsWith("/") ? webRoot.substring(0, webRoot.length()-1) : webRoot;
+    }
 
+    public List<LocatedTest> locateTests(final List<File> wheres, final String webRootRaw, final String requireBaseUrl){
+        if(wheres==null) throw new NullPointerException();
+        
+        final String webRoot = normalizedWebRoot(webRootRaw);
+        
+        final List<LocatedTest> results = new ArrayList<LocatedTest>();
+        
+        class Foo{
+        	final File where, path;
+
+			public Foo(File where, File path) {
+				super();
+				this.where = where;
+				this.path = path;
+			}
+        	
+        }
+        
+        final List<Foo> foos = new ArrayList<Foo>();
+        
+        long start = System.currentTimeMillis();
+        new PathSet(wheres).scanFiles(new PathSet.Visitor() {
+            @Override
+            public void visit(File where, File path) {
+            	foos.add(new Foo(where, path));
+            }
         });
+        
+        System.out.println("took " + ((System.currentTimeMillis()-start)/1000));
+        for(Foo foo : foos){
+        	final File dir = foo.where;
+        	final File path = foo.path;
+        	final String name = path.getName();
+            final String relativePath = stripLeadingSlash(path.getAbsolutePath().replaceAll(Pattern.quote(dir.getAbsolutePath()), ""));
+            final String root = webRoot.equals("")?"":addTrailingSlashIfMissing(stripLeadingSlash(webRoot));
+            try {
+                if(name.matches(".*Qunit.*\\.html")){
+                    results.add(new LocatedTest(relativePath, TestType.HANDCRAFTEDHTML, addTrailingSlashIfMissing(root) + relativePath, null, path));
+                }else {
+                    final TestType type;
+                    final String extension;
+                    
+                    if(name.endsWith(".qunit.js")){
+                        extension = ".js";
+                        type = TestType.JAVASCRIPT;
+                    }else if(name.endsWith(".qunit.coffee")){
+                        extension = ".coffee";
+                        type = TestType.COFFEESCRIPT;
+                    }else {
+                        type = null;
+                        extension = null;
+                    }
+                    if(type!=null) {
+                        final String requireJsName = requireJsName(requireBaseUrl, relativePath, root, extension);
+                        System.out.println("Found test " + dir + " ----> " + relativePath + "  (" + requireJsName + ")" );
+                        results.add(new LocatedTest(relativePath, type, "qunit-mojo/" + relativePath, requireJsName, path));
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         return results;
     }
 
+    private String requireJsName(final String requireBaseUrl, final String relativePath, final String root, final String suffix) {
+//    	System.out.println("base url is " + requireBaseUrl);
+        final String expectedPrefix;
+        
+        if(requireBaseUrl.isEmpty()){
+        	expectedPrefix = "";
+        }else if(requireBaseUrl.equals("/")){
+        	expectedPrefix = "";
+        }else{
+        	expectedPrefix = addTrailingSlashIfMissing(stripLeadingSlash(requireBaseUrl));
+        }
+//        System.out.println("root is " + root);
+        final String x = minusPrefix(expectedPrefix, root + minusSuffix(relativePath, suffix));
+        return x;
+    }
+
+    private String minusPrefix(final String prefix, final String str) {
+        if(!str.startsWith(prefix)) throw new RuntimeException(str + " doesn't start with " + prefix);
+        return str.substring(prefix.length());
+    }
+    
+    private String minusSuffix(final String str, final String suffix) {
+        if(!str.endsWith(suffix)) throw new RuntimeException(str + " doesn't end with " + suffix);
+        return str.substring(0, str.length() - suffix.length());
+    }
     private String addTrailingSlashIfMissing(String webRoot) {
         return webRoot.endsWith("/") ? webRoot : webRoot + "/";
     }

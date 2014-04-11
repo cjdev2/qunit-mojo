@@ -3,7 +3,7 @@ package com.cj.qunit.mojo;
 import org.apache.maven.plugin.MojoFailureException;
 
 import com.cj.qunit.mojo.http.WebServerUtils;
-import com.cj.qunit.mojo.http.WebServerUtils.JettyPlusPort;
+import com.cj.qunit.mojo.http.WebServerUtils.JettyPlusPortPlusScanner;
 import com.cj.qunit.mojo.jetty.JettyMavenLogger;
 
 
@@ -14,8 +14,8 @@ import com.cj.qunit.mojo.jetty.JettyMavenLogger;
 public class QunitServeMojo extends AbstractQunitMojo {
     
     public void execute() throws MojoFailureException {
-        JettyPlusPort jetty = WebServerUtils.launchHttpServer(webRoot(), codePaths(), extraPathsToServe(), super.webPathToRequireDotJsConfig(),
-                new JettyMavenLogger("foobar", getLog()));
+        JettyPlusPortPlusScanner jetty = WebServerUtils.launchHttpServer(webRoot(), codePaths(), extraPathsToServe(), super.webPathToRequireDotJsConfig(),
+                new JettyMavenLogger("foobar", getLog()), true);
         
         getLog().info("Server started: visit http://localhost:" + jetty.port + " to run your tests.");
         Object o = new Object();
