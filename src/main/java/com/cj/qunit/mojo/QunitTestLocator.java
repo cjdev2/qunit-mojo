@@ -10,7 +10,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 public class QunitTestLocator {
-    public enum TestType {JAVASCRIPT, COFFEESCRIPT, HANDCRAFTEDHTML}
+    public enum TestType {JAVASCRIPT, COFFEESCRIPT, HANDCRAFTEDHTML;}
     
     public static List<File> findCodePaths(File basedir) {
         List<File> codePaths = new ArrayList<File>();
