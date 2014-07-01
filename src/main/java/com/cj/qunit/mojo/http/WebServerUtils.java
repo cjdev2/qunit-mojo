@@ -37,6 +37,10 @@ public class WebServerUtils {
     }
 
     public static JettyPlusPortPlusScanner launchHttpServer(final String webRoot, final List<File> codePaths, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Logger log, final boolean cacheTests) {
+        return launchHttpServer(webRoot, codePaths, extraPathsToServe, webPathToRequireDotJsConfig, log, cacheTests, null);
+    }
+
+    public static JettyPlusPortPlusScanner launchHttpServer(final String webRoot, final List<File> codePaths, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Logger log, final boolean cacheTests, final String filterPattern) {
 
         if(log!=null){
             org.eclipse.jetty.util.log.Log.setLog(log);
@@ -50,7 +54,7 @@ public class WebServerUtils {
         for(int port: new Integer[]{8098, 8198, 8298, 8398, 8498, 8598, 8695, 8796}){
             try{
 
-                final Scanner scanner = new Scanner(port, webPathToRequireDotJsConfig, pathsToServe, webRoot, cacheTests);
+                final Scanner scanner = new Scanner(port, webPathToRequireDotJsConfig, pathsToServe, webRoot, cacheTests, filterPattern);
                 List<HttpObject> resources = new ArrayList<HttpObject>(Arrays.asList(new TestListingResource("/", webRoot, webPathToRequireDotJsConfig, pathsToServe, scanner)));
                 
                 for(File projectDirectory: pathsToServe){

@@ -197,28 +197,18 @@ public class QunitMavenRunner {
             requireDotJsConfig = webPathToRequireDotJsConfig;
         }
 
-
         validateJsConfigpath(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig);
-        final WebServerUtils.JettyPlusPortPlusScanner jetty = WebServerUtils.launchHttpServer(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig, jettyLog, true);
 
-        try{
+        final WebServerUtils.JettyPlusPortPlusScanner jetty = WebServerUtils.launchHttpServer(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig, jettyLog, true, filter);
+
+        try {
 
             final List<String> problems = new ArrayList<String>(); 
 
             final List<File> allPaths = new ArrayList<File>(codePaths);
             allPaths.addAll(extraPathsToServe);
             
-            final List<LocatedTest> allTests = new ArrayList<LocatedTest>();
-            
-            for(LocatedTest test: jetty.scanner.findTests()){
-                 if(test.matchesFilter(filter)){
-                     allTests.add(test);
-
-                     if (verbose) {
-                         log.info("found test file: " + test.relativePathToDetectedFile);
-                     }
-                 }
-            }
+            final List<LocatedTest> allTests = jetty.scanner.findTests();
 
             if (verbose) {
                 log.info(String.format("found %d test files", allTests.size()));

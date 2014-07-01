@@ -13,9 +13,14 @@ import com.cj.qunit.mojo.jetty.JettyMavenLogger;
  */
 public class QunitServeMojo extends AbstractQunitMojo {
     
+    /**
+     * @parameter expression="${qunit.filter}"
+     */
+    public String filterPattern;
+
     public void execute() throws MojoFailureException {
         JettyPlusPortPlusScanner jetty = WebServerUtils.launchHttpServer(webRoot(), codePaths(), extraPathsToServe(), super.webPathToRequireDotJsConfig(),
-                new JettyMavenLogger("foobar", getLog()), true);
+                new JettyMavenLogger("foobar", getLog()), true, filterPattern);
         
         getLog().info("Server started: visit http://localhost:" + jetty.port + " to run your tests.");
         Object o = new Object();

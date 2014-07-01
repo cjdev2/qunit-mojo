@@ -31,6 +31,10 @@ public class QunitTestLocator {
     }
 
     public List<LocatedTest> locateTests(final List<File> wheres, final String webRootRaw, final String requireBaseUrl){
+        return locateTests(wheres, webRootRaw, requireBaseUrl, null);
+    }
+
+    public List<LocatedTest> locateTests(final List<File> wheres, final String webRootRaw, final String requireBaseUrl, final String filter){
         if(wheres==null) throw new NullPointerException();
         
         final String webRoot = normalizedWebRoot(webRootRaw);
@@ -67,8 +71,11 @@ public class QunitTestLocator {
             final String root = webRoot.equals("")?"":addTrailingSlashIfMissing(stripLeadingSlash(webRoot));
             try {
                 if(name.matches(".*Qunit.*\\.html")){
-                	System.out.println("Found handcoded test " + dir + " ----> " + relativePath );
-                    results.add(new LocatedTest(relativePath, TestType.HANDCRAFTEDHTML, addTrailingSlashIfMissing(root) + relativePath, null, path));
+                    LocatedTest locatedTest = new LocatedTest(relativePath, TestType.HANDCRAFTEDHTML, addTrailingSlashIfMissing(root) + relativePath, null, path);
+                    if (locatedTest.matchesFilter(filter)) {
+                        System.out.println("Found handcoded test " + dir + " ----> " + relativePath );
+                        results.add(locatedTest);
+                    }
                 }else {
                     final TestType type;
                     final String extension;
@@ -85,8 +92,11 @@ public class QunitTestLocator {
                     }
                     if(type!=null) {
                         final String requireJsName = requireJsName(requireBaseUrl, relativePath, root, extension);
-                        System.out.println("Found test " + dir + " ----> " + relativePath + "  (" + requireJsName + ")" );
-                        results.add(new LocatedTest(relativePath, type, "qunit-mojo/" + relativePath, requireJsName, path));
+                        LocatedTest locatedTest = new LocatedTest(relativePath, type, "qunit-mojo/" + relativePath, requireJsName, path);
+                        if (locatedTest.matchesFilter(filter)) {
+                            System.out.println("Found test " + dir + " ----> " + relativePath + "  (" + requireJsName + ")" );
+                            results.add(locatedTest);
+                        }
                     }
                 }
             } catch (Exception e) {

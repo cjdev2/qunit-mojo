@@ -28,51 +28,6 @@ public class QunitMavenRunnerTest {
         }
     }
     
-    
-    @Test
-    public void theFilterMatchesTheTestNameOrThePathOrARegex() throws Exception {
-        final String[] filters = {"bunnies", "somewhere-else", "regex:.*some.*nies.*"};
-        
-        for(String filter : filters){
-            // given
-            File projectDirectory = tempDirectory();
-            
-            {
-                File srcMainHtmlDirectory = new File(projectDirectory, "src/test/somewhere");
-                srcMainHtmlDirectory.mkdirs();
-                FileUtils.writeStringToFile(new File(srcMainHtmlDirectory, "frogs.qunit.js"), "require([], function(){test('dummy test', function(){ok(true);});})");
-            }
-            
-            {
-                File srcMainHtmlDirectory = new File(projectDirectory, "src/test/somewhere-else");
-                srcMainHtmlDirectory.mkdirs();
-                FileUtils.writeStringToFile(new File(srcMainHtmlDirectory, "bunnies.qunit.js"), "require([], function(){test('dummy test', function(){ok(true);});})");
-            }
-            
-            
-            QunitMavenRunner runner = new QunitMavenRunner();
-            FakeLog log = new FakeLog();
-            
-            // when
-            List<String> problems;
-            Exception t;
-            try {
-                problems = runner.run("", Collections.singletonList(projectDirectory), filter, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
-                t = null;
-            } catch (Exception e) {
-                t = e;
-                t.printStackTrace();
-                problems = Collections.emptyList();
-            }
-            
-            // then
-            Assert.assertTrue("The plugin should not blow up", t == null);
-            Assert.assertEquals(0, problems.size());
-            Assert.assertEquals(1, log.pathsRun.size());
-            Assert.assertEquals("src/test/somewhere-else/bunnies.qunit.js", log.pathsRun.get(0));
-        }
-    }
-    
     @Test
     public void theRunnerProvidesRequireDotJs() throws Exception {
         // given

@@ -6,10 +6,14 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.junit.Test;
 
 
@@ -177,6 +181,41 @@ public class QunitTestLocatorTest {
         assertEquals("qunit-mojo/somedir/Whatever.qunit.coffee", result.relativePathToHtmlFile);
         assertEquals("foo/bar/somedir/Whatever.qunit", result.requireJsModuleName);
         assertEquals(new File(dir, "somedir/Whatever.qunit.coffee"), result.pathOnDisk);
+    }
+
+    @Test
+    public void theFilterMatchesTheTestNameOrThePathOrARegex() throws Exception {
+
+        final String[] filters = {"bunnies", "somewhere-else", "regex:.*some.*nies.*"};
+        
+        for(String filter : filters){
+            // given
+            File projectDirectory = tempDirectory();
+            
+            {
+                File srcTestDirectory = new File(projectDirectory, "src/test/somewhere");
+                srcTestDirectory.mkdirs();
+                FileUtils.writeStringToFile(new File(srcTestDirectory, "frogs.qunit.js"), "require([], function(){test('dummy test', function(){ok(true);});})");
+            }
+            
+            {
+                File srcTestDirectory = new File(projectDirectory, "src/test/somewhere-else");
+                srcTestDirectory.mkdirs();
+                FileUtils.writeStringToFile(new File(srcTestDirectory, "bunnies.qunit.js"), "require([], function(){test('dummy test', function(){ok(true);});})");
+            }
+            
+            QunitTestLocator locator = new QunitTestLocator();
+            
+            // when
+            List<LocatedTest> results = locator.locateTests(Collections.singletonList(projectDirectory), "/foo/bar/", "", filter);
+            
+            // then
+            assertEquals(1, results.size());
+            LocatedTest result = results.get(0);
+            assertEquals("qunit-mojo/src/test/somewhere-else/bunnies.qunit.js", result.relativePathToHtmlFile);
+            assertEquals("foo/bar/src/test/somewhere-else/bunnies.qunit", result.requireJsModuleName);
+            assertEquals(new File(projectDirectory, "src/test/somewhere-else/bunnies.qunit.js"), result.pathOnDisk);
+        }
     }
 
     private static void write(File baseDir, String path, String content){
