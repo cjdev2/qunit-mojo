@@ -11,7 +11,7 @@ public class LocatedTest {
     public final String relativePathToHtmlFile;
     public final String requireJsModuleName;
     public final File pathOnDisk;
-    
+
     public LocatedTest(String relativePathToDetectedFile, TestType type,
             String relativePathToHtmlFile, String requireJsModuleName,
             File pathOnDisk) {
@@ -19,11 +19,11 @@ public class LocatedTest {
         this.relativePathToDetectedFile = relativePathToDetectedFile;
         this.type = type;
         this.relativePathToHtmlFile = relativePathToHtmlFile;
-        this.requireJsModuleName = requireJsModuleName;
+        this.requireJsModuleName = requireJsModuleName==null? null : type.getRequireJsPluginPrefix() + requireJsModuleName;
         this.pathOnDisk = pathOnDisk;
         if(pathOnDisk==null) throw new NullPointerException();
     }
-    
+
     public String groupName(){
     	if(type==TestType.HANDCRAFTEDHTML){
     		return parentPath(relativePathToDetectedFile);
@@ -31,7 +31,8 @@ public class LocatedTest {
     		return parentPath(requireJsModuleName);
     	}
     }
-    
+
+
 
     private String parentPath(final String path) {
         int idx = path.lastIndexOf('/');

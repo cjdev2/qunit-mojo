@@ -24,30 +24,30 @@ public class QunitTestLocatorTest {
 
         // given
         File dir = tempDirectory();
-        
+
         write(dir, "somedir/Whatever.Qunit.html", "dummy content");
         QunitTestLocator locator = new QunitTestLocator();
-        
+
         // when
         List<LocatedTest> results = locator.locateTests(Collections.singletonList(dir), "/foo/bar", "");
-        
+
         // then
         assertEquals(1, results.size());
         assertEquals("foo/bar/somedir/Whatever.Qunit.html", results.get(0).relativePathToHtmlFile);
     }
-    
+
     @Test
     public void worksWithWebRootsThatIncludeATrailingSlash() {
 
         // given
         File dir = tempDirectory();
-        
+
         write(dir, "somedir/Whatever.Qunit.html", "dummy content");
         QunitTestLocator locator = new QunitTestLocator();
-        
+
         // when
         List<LocatedTest> results = locator.locateTests(Collections.singletonList(dir), "/foo/bar/", "");
-        
+
         // then
         assertEquals(1, results.size());
         assertEquals("foo/bar/somedir/Whatever.Qunit.html", results.get(0).relativePathToHtmlFile);
@@ -72,7 +72,7 @@ public class QunitTestLocatorTest {
         assertEquals("bar/somedir/Whatever.qunit", result.requireJsModuleName);
         assertEquals(new File(dir, "somedir/Whatever.qunit.js"), result.pathOnDisk);
     }
-    
+
 
     @Test
     public void worksWithSingleSlashRequirePrefixes() {
@@ -93,7 +93,7 @@ public class QunitTestLocatorTest {
         assertEquals("foo/bar/somedir/Whatever.qunit", result.requireJsModuleName);
         assertEquals(new File(dir, "somedir/Whatever.qunit.js"), result.pathOnDisk);
     }
-       
+
     @Test
     public void theMostSpecificBaseDirWins() {
 
@@ -102,11 +102,11 @@ public class QunitTestLocatorTest {
 
         write(dir, "somedir/Whatever.qunit.js", "dummy content");
         QunitTestLocator locator = new QunitTestLocator();
-        
+
         List<File> dirs = Arrays.asList(
                                 dir,
                                 new File(dir, "somedir"));
-        
+
         // when
         List<LocatedTest> results = locator.locateTests(dirs, "/foo/bar/", "");
 
@@ -117,8 +117,8 @@ public class QunitTestLocatorTest {
         assertEquals("foo/bar/Whatever.qunit", result.requireJsModuleName);
         assertEquals(new File(dir, "somedir/Whatever.qunit.js"), result.pathOnDisk);
     }
-    
-    
+
+
     @Test
     public void theMostSpecificBaseDirWinsForHandcodedFiles() {
 
@@ -127,11 +127,11 @@ public class QunitTestLocatorTest {
 
         write(dir, "somedir/WhateverQunitTest.html", "dummy content");
         QunitTestLocator locator = new QunitTestLocator();
-        
+
         List<File> dirs = Arrays.asList(
                                 dir,
                                 new File(dir, "somedir"));
-        
+
         // when
         List<LocatedTest> results = locator.locateTests(dirs, "/foo/bar/", "");
 
@@ -142,7 +142,7 @@ public class QunitTestLocatorTest {
         assertEquals(null, result.requireJsModuleName);
         assertEquals(new File(dir, "somedir/WhateverQunitTest.html"), result.pathOnDisk);
     }
-    
+
     @Test
     public void worksWithJavascript() {
 
@@ -162,7 +162,7 @@ public class QunitTestLocatorTest {
         assertEquals("foo/bar/somedir/Whatever.qunit", result.requireJsModuleName);
         assertEquals(new File(dir, "somedir/Whatever.qunit.js"), result.pathOnDisk);
     }
-    
+
     @Test
     public void worksWithCoffeescript() {
 
@@ -179,36 +179,56 @@ public class QunitTestLocatorTest {
         assertEquals(1, results.size());
         LocatedTest result = results.get(0);
         assertEquals("qunit-mojo/somedir/Whatever.qunit.coffee", result.relativePathToHtmlFile);
-        assertEquals("foo/bar/somedir/Whatever.qunit", result.requireJsModuleName);
+        assertEquals("cs!foo/bar/somedir/Whatever.qunit", result.requireJsModuleName);
         assertEquals(new File(dir, "somedir/Whatever.qunit.coffee"), result.pathOnDisk);
+    }
+
+    @Test
+    public void worksWithJsx() {
+
+        // given
+        File dir = tempDirectory();
+
+        write(dir, "somedir/Whatever.qunit.jsx", "dummy content");
+        QunitTestLocator locator = new QunitTestLocator();
+
+        // when
+        List<LocatedTest> results = locator.locateTests(Collections.singletonList(dir), "/foo/bar/", "");
+
+        // then
+        assertEquals(1, results.size());
+        LocatedTest result = results.get(0);
+        assertEquals("qunit-mojo/somedir/Whatever.qunit.jsx", result.relativePathToHtmlFile);
+        assertEquals("jsx!foo/bar/somedir/Whatever.qunit", result.requireJsModuleName);
+        assertEquals(new File(dir, "somedir/Whatever.qunit.jsx"), result.pathOnDisk);
     }
 
     @Test
     public void theFilterMatchesTheTestNameOrThePathOrARegex() throws Exception {
 
         final String[] filters = {"bunnies", "somewhere-else", "regex:.*some.*nies.*"};
-        
+
         for(String filter : filters){
             // given
             File projectDirectory = tempDirectory();
-            
+
             {
                 File srcTestDirectory = new File(projectDirectory, "src/test/somewhere");
                 srcTestDirectory.mkdirs();
                 FileUtils.writeStringToFile(new File(srcTestDirectory, "frogs.qunit.js"), "require([], function(){test('dummy test', function(){ok(true);});})");
             }
-            
+
             {
                 File srcTestDirectory = new File(projectDirectory, "src/test/somewhere-else");
                 srcTestDirectory.mkdirs();
                 FileUtils.writeStringToFile(new File(srcTestDirectory, "bunnies.qunit.js"), "require([], function(){test('dummy test', function(){ok(true);});})");
             }
-            
+
             QunitTestLocator locator = new QunitTestLocator();
-            
+
             // when
             List<LocatedTest> results = locator.locateTests(Collections.singletonList(projectDirectory), "/foo/bar/", "", filter);
-            
+
             // then
             assertEquals(1, results.size());
             LocatedTest result = results.get(0);
