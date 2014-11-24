@@ -18,7 +18,30 @@ import org.junit.Test;
 import com.cj.qunit.mojo.QunitMavenRunner;
 
 public class QunitMavenRunnerTest {
+	private static final String REQUIRE_PATH_AND_SHIM=
+	                        "paths: {										  "+
+                        	"qunit: '/qunit-mojo/qunit-1.11.0',			  "+
+                        	"jquery: '/qunit-mojo/jquery-1.8.2.min'       "+
+                    	"},                                               "+
+                    	"shim: {                                          "+
+				        "    react: {                                     "+
+				        "        exports: 'React',                        "+
+				        "        deps: ['/qunit-mojo/shimBind']           "+
+				        "    },                                           "+
+				        "    jquery: {                                    "+
+				        "        exports: '$'                             "+
+				        "    },                                           "+
+				        "    qunit:{                                      "+
+				        "         exports: 'QUnit',                       "+
+				        "         init: function() {                      "+
+				        "             QUnit.config.autoload = false;      "+
+				        "             QUnit.config.autostart = false;     "+
+				        "         }										  "+
+				        "    }											  "+
+				        "},	                                              ";
 
+	
+	
     private static void write(File baseDir, String path, String content){
         try {
             File where = new File(baseDir, path);
@@ -68,7 +91,8 @@ public class QunitMavenRunnerTest {
 
         write(projectDirectory, "src/main/whatever/my-require-config.js",
                 "var require = {" +
-                        "baseUrl: '/path/to/my/app/'" +
+                        "baseUrl: '/path/to/my/app/'," +
+                        REQUIRE_PATH_AND_SHIM+
                 "};");
 
         write(projectDirectory, "src/main/whatever/a.js",
@@ -202,7 +226,7 @@ public class QunitMavenRunnerTest {
 
         FileUtils.writeStringToFile(new File(srcMainHtmlDirectory, "Whatever.qunit.js"),
         									"module('mytests');" +
-        									"test('mytest', function(){ok(true);});");
+        									"\ntest('mytest', function(){\nok(true);});");
 
         QunitMavenRunner runner = new QunitMavenRunner();
         FakeLog log = new FakeLog();
