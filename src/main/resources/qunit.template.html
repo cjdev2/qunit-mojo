@@ -1,6 +1,10 @@
 <html>
 <head>
     <title>YOUR_JAVASCRIPT_TEST_FILE_NAME_GOES_HERE</title>
+    <script type="text/javascript" src="/qunit-mojo/qunit-1.11.0.js"></script>
+    <script>
+        QUnit.config.autostart = false;
+    </script>
     <style type="text/css">
     .all-files-link {
 	    margin-bottom: 5px;
@@ -18,10 +22,9 @@
     </style>
     <link rel="stylesheet" href="/qunit-mojo/qunit-1.11.0.css" type="text/css" media="screen"/>
     YOUR_REQUIRE_DOT_JS_CONFIG_GOES_HERE
-
     <script type="text/javascript" src="/qunit-mojo/require-2.1.1.min.js"></script>
     <script>
-    	function errorHandler(error, QUnit){
+    	function errorHandler(error){
     	    var message = 
     	               "Sorry, I could not start qunit because require.js couldn't load YOUR_JAVASCRIPT_TEST_FILE_GOES_HERE: " + error.message + "\n" + 
     	               "Here are some details about the require.js error:\n" + 
@@ -33,16 +36,14 @@
     	    }
     	    
     	    console.log(message);
-    	    if(QUnit){
-	    	    QUnit.test("Require.js load failure", function(){
-	    	        ok(false, message);
-	    	    });
-	    	    QUnit.load();
-	    	    Qunit.start();
-    	    }
+
+    	    QUnit.test("Require.js load failure", function(){
+    	        ok(false, message);
+    	    });
+    	    QUnit.start();
     	}
-    	require(["jquery", "qunit"], function($, QUnit){
-    			require(["YOUR_JAVASCRIPT_TEST_FILE_GOES_HERE"], function(){QUnit.load();QUnit.start();}, errorHandler);
+    	require(["jquery"], function($){
+    			require(["YOUR_JAVASCRIPT_TEST_FILE_GOES_HERE"], QUnit.start, errorHandler);
     	}, errorHandler);
 
     </script>

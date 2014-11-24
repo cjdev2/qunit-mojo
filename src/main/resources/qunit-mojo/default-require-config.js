@@ -6,7 +6,6 @@ var require = {
         react: '/qunit-mojo/react-0.12.0',
         JSXTransformer: '/qunit-mojo/JSXTransformer-0.12.0-rc1',
         'coffee-script': '/qunit-mojo/coffee-script-1.6.3',
-        qunit: '/qunit-mojo/qunit-1.11.0',
         jquery: '/qunit-mojo/jquery-1.8.2.min'
     },
     shim: {
@@ -16,13 +15,6 @@ var require = {
         },
         jquery: {
             exports: '$'
-        },
-        qunit:{
-             exports: 'QUnit',
-             init: function() {
-                 QUnit.config.autoload = false;
-                 QUnit.config.autostart = false;
-             }
         }
     },
     jsx: {

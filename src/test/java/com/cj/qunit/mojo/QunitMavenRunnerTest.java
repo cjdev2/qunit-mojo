@@ -19,25 +19,13 @@ import com.cj.qunit.mojo.QunitMavenRunner;
 
 public class QunitMavenRunnerTest {
 	private static final String REQUIRE_PATH_AND_SHIM=
-	                        "paths: {										  "+
-                        	"qunit: '/qunit-mojo/qunit-1.11.0',			  "+
-                        	"jquery: '/qunit-mojo/jquery-1.8.2.min'       "+
+	                    "paths: {										  "+
+                        "    jquery: '/qunit-mojo/jquery-1.8.2.min'       "+
                     	"},                                               "+
                     	"shim: {                                          "+
-				        "    react: {                                     "+
-				        "        exports: 'React',                        "+
-				        "        deps: ['/qunit-mojo/shimBind']           "+
-				        "    },                                           "+
 				        "    jquery: {                                    "+
 				        "        exports: '$'                             "+
-				        "    },                                           "+
-				        "    qunit:{                                      "+
-				        "         exports: 'QUnit',                       "+
-				        "         init: function() {                      "+
-				        "             QUnit.config.autoload = false;      "+
-				        "             QUnit.config.autostart = false;     "+
-				        "         }										  "+
-				        "    }											  "+
+				        "    }                                            "+
 				        "},	                                              ";
 
 	
