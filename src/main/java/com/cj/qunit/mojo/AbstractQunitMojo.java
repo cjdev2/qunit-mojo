@@ -23,7 +23,7 @@ abstract class AbstractQunitMojo extends AbstractMojo {
     /**
      * @parameter
      */
-    private String webPathToRequireDotJsConfig = "";
+    private String webPathToRequireDotJsConfig = null;
 
     /**
      * @parameter default-value=5000
