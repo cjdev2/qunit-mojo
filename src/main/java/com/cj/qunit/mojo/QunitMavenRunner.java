@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -210,11 +212,11 @@ public class QunitMavenRunner {
             
             final List<LocatedTest> allTests = jetty.scanner.findTests();
 
+            final List<LocatedTest> testsRemaining = prioritizeJsTests(allTests);
+
             if (verbose) {
-                log.info(String.format("found %d test files", allTests.size()));
+                log.info(String.format("found %d test files", testsRemaining.size()));
             }
-            
-            final List<LocatedTest> testsRemaining = new ArrayList<LocatedTest>(allTests);
 
             log.info("Executing qunit tests on " + numThreads + " thread(s) using " + runner.toString().toLowerCase());
             
@@ -263,8 +265,27 @@ public class QunitMavenRunner {
             }
         }
     }
-    
-    
+
+    private List<LocatedTest> prioritizeJsTests(List<LocatedTest> tests) {
+        final Map<String, LocatedTest> finalResults = new HashMap<String, LocatedTest>();
+        //add all the non-js files
+        for(LocatedTest test : tests) {
+            if(test.type != QunitTestLocator.TestType.JAVASCRIPT && test.type != QunitTestLocator.TestType.HANDCRAFTEDHTML) {
+                String withoutPlugin = test.requireJsModuleName.replace(test.type.getRequireJsPluginPrefix(), "");
+                finalResults.put(withoutPlugin, test);
+            }
+        }
+        //overwrite with js files
+        for(LocatedTest test : tests) {
+            if(test.type == QunitTestLocator.TestType.JAVASCRIPT || test.type == QunitTestLocator.TestType.HANDCRAFTEDHTML) {
+                finalResults.put(test.requireJsModuleName, test);
+            }
+        }
+
+        return new ArrayList<LocatedTest>(finalResults.values());
+    }
+
+
     private void runInParallel(int numThreads, Listener log, final Runnable runnable) {
 
         List<Thread> threads = new ArrayList<Thread>();
