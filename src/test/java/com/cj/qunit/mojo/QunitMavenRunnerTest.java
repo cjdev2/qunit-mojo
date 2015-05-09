@@ -64,11 +64,7 @@ public class QunitMavenRunnerTest {
             problems = Collections.emptyList();
         }
 		
-        // then
-		
-		for(String problem : problems)
-			System.out.println("PROBLEM123:" + problem);
-		
+        // then		
         Assert.assertTrue("The plugin should not blow up", t == null);
         Assert.assertEquals(0, problems.size());
         Assert.assertEquals(1, log.pathsRun.size());
@@ -126,7 +122,6 @@ public class QunitMavenRunnerTest {
             System.err.println(p);
         }
         Assert.assertEquals(0, problems.size());
-		System.out.println(log.pathsRun);
         Assert.assertEquals(1, log.pathsRun.size());
         Assert.assertEquals("somedir/Whatever.qunit.js", log.pathsRun.get(0));
 
@@ -465,9 +460,8 @@ public class QunitMavenRunnerTest {
     }
 
     private static File tempDirectory(){
-		File d = null;
         try {
-            d = File.createTempFile("whatever", ".dir");
+            File d = File.createTempFile("whatever", ".dir");
             if(!d.delete() || !d.mkdir()){
                 throw new RuntimeException("Could not create temporary directory at " + d.getAbsolutePath());
             }
