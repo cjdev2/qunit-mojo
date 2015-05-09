@@ -20,7 +20,7 @@ import com.cj.qunit.mojo.QunitMavenRunner;
 public class QunitMavenRunnerTest {
 	private static final String REQUIRE_PATH_AND_SHIM=
 	                    "paths: {										  "+
-                        "    jquery: '/qunit-mojo/jquery-1.8.2.min'       "+
+                        "    jquery: '/qunit-mojo/jquery-1.11.3.min'       "+
                     	"},                                               "+
                     	"shim: {                                          "+
 				        "    jquery: {                                    "+
@@ -367,7 +367,7 @@ public class QunitMavenRunnerTest {
         File srcMainHtmlDirectory = new File(projectDirectory, "src/test/whatever");
         srcMainHtmlDirectory.mkdirs();
 
-        for(String name : new String[]{"SomeQunitTest.html", "jquery-1.8.2.min.js", "qunit-1.18.0.css", "qunit-1.18.0.js"}){
+        for(String name : new String[]{"SomeQunitTest.html", "jquery-1.11.3.min.js", "qunit-1.18.0.css", "qunit-1.18.0.js"}){
             copyToDiskFromClasspath(srcMainHtmlDirectory, name);
         }
 
@@ -401,7 +401,7 @@ public class QunitMavenRunnerTest {
         File srcMainHtmlDirectory = new File(projectDirectory, "src/test/html");
         srcMainHtmlDirectory.mkdirs();
 
-        for(String name : new String[]{"SomeFailingQunitTest.html", "jquery-1.8.2.min.js", "qunit-1.18.0.css", "qunit-1.18.0.js"}){
+        for(String name : new String[]{"SomeFailingQunitTest.html", "jquery-1.11.3.min.js", "qunit-1.18.0.css", "qunit-1.18.0.js"}){
             copyToDiskFromClasspath(srcMainHtmlDirectory, name);
         }
 

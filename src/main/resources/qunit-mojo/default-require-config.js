@@ -6,7 +6,7 @@ var require = {
         react: '/qunit-mojo/react-0.12.0',
         JSXTransformer: '/qunit-mojo/JSXTransformer-0.12.0-rc1',
         'coffee-script': '/qunit-mojo/coffee-script-1.6.3',
-        jquery: '/qunit-mojo/jquery-1.8.2.min'
+        jquery: '/qunit-mojo/jquery-1.11.3.min'
     },
     shim: {
         react: {
