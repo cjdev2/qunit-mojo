@@ -63,8 +63,12 @@ public class QunitMavenRunnerTest {
             t.printStackTrace();
             problems = Collections.emptyList();
         }
-
+		
         // then
+		
+		for(String problem : problems)
+			System.out.println("PROBLEM123:" + problem);
+		
         Assert.assertTrue("The plugin should not blow up", t == null);
         Assert.assertEquals(0, problems.size());
         Assert.assertEquals(1, log.pathsRun.size());
@@ -122,6 +126,7 @@ public class QunitMavenRunnerTest {
             System.err.println(p);
         }
         Assert.assertEquals(0, problems.size());
+		System.out.println(log.pathsRun);
         Assert.assertEquals(1, log.pathsRun.size());
         Assert.assertEquals("somedir/Whatever.qunit.js", log.pathsRun.get(0));
 
@@ -179,7 +184,6 @@ public class QunitMavenRunnerTest {
 
     }
 
-
     @Test
     public void nonexistentRequireDotJsConfigFilesAreUnacceptable() throws Exception {
         // given
@@ -204,6 +208,8 @@ public class QunitMavenRunnerTest {
                 "You configured a require.js configuration path of \"/some-nonexistent-file.js\".  However, it doesn't seem to exist.  Here's where I looked for it:\n"+
                 "    " + projectDirectory.getAbsolutePath() + "/some-nonexistent-file.js", err.getMessage().trim());
     }
+
+
 
     @Test
     public void findsTestJsFilesUnderTheSrcTestDirectory() throws Exception {
@@ -361,7 +367,7 @@ public class QunitMavenRunnerTest {
         File srcMainHtmlDirectory = new File(projectDirectory, "src/test/whatever");
         srcMainHtmlDirectory.mkdirs();
 
-        for(String name : new String[]{"SomeQunitTest.html", "jquery-1.8.2.min.js", "qunit-1.11.0.css", "qunit-1.11.0.js"}){
+        for(String name : new String[]{"SomeQunitTest.html", "jquery-1.8.2.min.js", "qunit-1.18.0.css", "qunit-1.18.0.js"}){
             copyToDiskFromClasspath(srcMainHtmlDirectory, name);
         }
 
@@ -395,7 +401,7 @@ public class QunitMavenRunnerTest {
         File srcMainHtmlDirectory = new File(projectDirectory, "src/test/html");
         srcMainHtmlDirectory.mkdirs();
 
-        for(String name : new String[]{"SomeFailingQunitTest.html", "jquery-1.8.2.min.js", "qunit-1.11.0.css", "qunit-1.11.0.js"}){
+        for(String name : new String[]{"SomeFailingQunitTest.html", "jquery-1.8.2.min.js", "qunit-1.18.0.css", "qunit-1.18.0.js"}){
             copyToDiskFromClasspath(srcMainHtmlDirectory, name);
         }
 
@@ -426,7 +432,7 @@ public class QunitMavenRunnerTest {
         Assert.assertTrue(problem.contains("module with failing test in it: this test left intentionally failing"));
         Assert.assertTrue(problem.contains("0 assertions of 1 passed, 1 failed"));
     }
-
+	
     private static class FakeLog implements QunitMavenRunner.Listener {
         List<String> pathsRun = new ArrayList<String>();
 
@@ -459,12 +465,12 @@ public class QunitMavenRunnerTest {
     }
 
     private static File tempDirectory(){
+		File d = null;
         try {
-            File d = File.createTempFile("whatever", ".dir");
+            d = File.createTempFile("whatever", ".dir");
             if(!d.delete() || !d.mkdir()){
                 throw new RuntimeException("Could not create temporary directory at " + d.getAbsolutePath());
             }
-
             return d;
         } catch (IOException e) {
             throw new RuntimeException(e);

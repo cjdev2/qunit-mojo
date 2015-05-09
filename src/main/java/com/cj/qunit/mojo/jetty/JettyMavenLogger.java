@@ -72,6 +72,11 @@ public class JettyMavenLogger implements org.eclipse.jetty.util.log.Logger {
     }
 
     @Override
+    public void debug(String msg, long stuff) {
+        log.debug(msg);
+    }
+
+    @Override
     public void debug(Throwable thrown) {
         log.debug(thrown);
     }

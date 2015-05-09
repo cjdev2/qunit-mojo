@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>YOUR_JAVASCRIPT_TEST_FILE_NAME_GOES_HERE</title>
-    <script type="text/javascript" src="/qunit-mojo/qunit-1.11.0.js"></script>
+    <script type="text/javascript" src="/qunit-mojo/qunit-1.18.0.js"></script>
     <script>
         QUnit.config.autostart = false;
     </script>
@@ -20,9 +20,9 @@
 		font-family: sans-serif;
     }
     </style>
-    <link rel="stylesheet" href="/qunit-mojo/qunit-1.11.0.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="/qunit-mojo/qunit-1.18.0.css" type="text/css" media="screen"/>
     YOUR_REQUIRE_DOT_JS_CONFIG_GOES_HERE
-    <script type="text/javascript" src="/qunit-mojo/require-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/qunit-mojo/require-2.1.17.min.js"></script>
     <script>
     	function errorHandler(error){
     	    var message = 
@@ -37,13 +37,13 @@
     	    
     	    console.log(message);
 
-    	    QUnit.test("Require.js load failure", function(){
-    	        ok(false, message);
+    	    QUnit.test("Require.js load failure", function(assert){
+    	        assert.ok(false, message);
     	    });
     	    QUnit.start();
     	}
-    	require(["jquery"], function($){
-    			require(["YOUR_JAVASCRIPT_TEST_FILE_GOES_HERE"], QUnit.start, errorHandler);
+    	requirejs(["jquery"], function($){
+    			requirejs(["YOUR_JAVASCRIPT_TEST_FILE_GOES_HERE"], QUnit.start, errorHandler);
     	}, errorHandler);
 
     </script>
