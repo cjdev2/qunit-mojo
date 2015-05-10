@@ -24,6 +24,11 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
      * @parameter expression="${qunit.runner}" default-value=PHANTOMJS
      */
     public String runner;
+
+    /**
+     * @parameter expression="${qunit.runnerOptions}"
+     */
+    public String runnerOptions;
     
     /**
      * @parameter expression="${qunit.filter}"
@@ -90,6 +95,7 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
                                             webPathToRequireDotJsConfig(), 
                                             listener, 
                                             returnTimeout(),
+											runnerOptions,
                                             new JettyMavenLogger("foobar", getLog()));
         
         if(!problems.isEmpty()){

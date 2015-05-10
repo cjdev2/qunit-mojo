@@ -26,6 +26,7 @@ public class QunitMavenRunner {
                     final WebServerUtils.JettyPlusPortPlusScanner jetty,
                     final LocatedTest test,
                     final String name,  int testTimeout,
+					final String runnerOptions,
                     final Listener listener,
                     boolean verbose,
                     boolean preserveTempFiles,
@@ -42,6 +43,7 @@ public class QunitMavenRunner {
                     final WebServerUtils.JettyPlusPortPlusScanner jetty,
                     final LocatedTest test,
                     final String name,  int testTimeout,
+					final String runnerOptions,
                     final Listener listener,
                     boolean verbose,
                     boolean preserveTempFiles,
@@ -60,6 +62,7 @@ public class QunitMavenRunner {
                         String url = baseUrl + "/" + test.relativePathToHtmlFile;
                         String[] command = {
                                 "phantomjs",
+								runnerOptions,
                                 f.getAbsolutePath(),
                                 url,
                                 Integer.toString(testTimeout)};
@@ -127,6 +130,7 @@ public class QunitMavenRunner {
                 final WebServerUtils.JettyPlusPortPlusScanner jetty,
                 final LocatedTest test,
                 final String name,  int testTimeout,
+				final String runnerOptions,
                 final Listener listener,
                 boolean verbose,
                 boolean preserveTempFiles,
@@ -188,7 +192,7 @@ public class QunitMavenRunner {
         }
     }
     
-    public List<String> run(final String webRoot, final List<File> codePaths, final String filter, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Listener log, final int testTimeout, Logger jettyLog) {
+    public List<String> run(final String webRoot, final List<File> codePaths, final String filter, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Listener log, final int testTimeout, final String runnerOptions, Logger jettyLog) {
         final String requireDotJsConfig;
 
         final String normalizedWebRoot = normalizedWebRoot(webRoot);
@@ -240,7 +244,7 @@ public class QunitMavenRunner {
 
                         String problem = null;
                         try {
-                            problem = runner.runTest(jetty, test, relativePathToDetectedFile, testTimeout, log, verbose, preserveTempFiles, retryCount);
+                            problem = runner.runTest(jetty, test, relativePathToDetectedFile, testTimeout, runnerOptions, log, verbose, preserveTempFiles, retryCount);
                         } catch (Throwable m){
                             problem = "Problems found in '" + relativePathToDetectedFile +"':\n"+m.getMessage();
                         }   
