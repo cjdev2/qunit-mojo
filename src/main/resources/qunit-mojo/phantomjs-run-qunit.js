@@ -68,14 +68,14 @@ function versionCheck(){
             });
 
             if (qunitMissing) {
-                console.error('The `QUnit` object is not present on this page.');
+                console.error('Test URL: ' + url + ' - The `QUnit` object is not present on this page.');
                 phantom.exit(1);
             }
 
             // Set a timeout on the test running, otherwise tests with async problems will hang forever
             if (typeof timeout === 'number') {
                 setTimeout(function () {
-                    console.error('The specified timeout of ' + timeout + ' ms has expired. Aborting...');
+                    console.error('Test URL: ' + url + ' - The specified timeout of ' + timeout + ' ms has expired. Aborting...');
                     phantom.exit(1);
                 }, timeout);
             }
@@ -87,7 +87,7 @@ function versionCheck(){
             QUnit.done(function (result) {
                 var isFailure = (result.total === 0 || result.failed);
 
-                console.log('Tests run: ' + result.total + ', Passed: ' + result.passed + ', Failures: ' + result.failed + ', Time elapsed: ' + result.runtime + " ms" + (isFailure ? " <<< FAILURE!" : ""));
+                console.log("Test URL: " + window.document.URL +', Tests run: ' + result.total + ', Passed: ' + result.passed + ', Failures: ' + result.failed + ', Time elapsed: ' + result.runtime + " ms" + (isFailure ? " <<< FAILURE!" : ""));
 
                 if (typeof window.callPhantom === 'function') {
                     window.callPhantom({
@@ -100,7 +100,7 @@ function versionCheck(){
             QUnit.log(function (assertion) {
                 if (false === assertion.result) {
 
-                    var failureMessage = "*** Assertion FAILED!! Test: [" + assertion.name + "]";
+                    var failureMessage = "*** Assertion FAILED!! Test URL: " + window.document.URL + " Test: [" + assertion.name + "]";
 
                     if (assertion.message) {
                         failureMessage += " Message: [" + assertion.message + "]";
