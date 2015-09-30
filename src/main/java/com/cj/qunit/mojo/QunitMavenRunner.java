@@ -277,12 +277,21 @@ public class QunitMavenRunner {
         }
         //overwrite with js files
         for(LocatedTest test : tests) {
-            if(test.type == QunitTestLocator.TestType.JAVASCRIPT || test.type == QunitTestLocator.TestType.HANDCRAFTEDHTML) {
+            if(test.type == QunitTestLocator.TestType.JAVASCRIPT) {
                 finalResults.put(test.requireJsModuleName, test);
             }
         }
 
-        return new ArrayList<LocatedTest>(finalResults.values());
+        ArrayList<LocatedTest> locatedTests = new ArrayList<LocatedTest>(finalResults.values());
+
+        // hand crafted tests don't have a requireJsModuleName, so we can't put them in a map!
+        for(LocatedTest test : tests) {
+            if(test.type == QunitTestLocator.TestType.HANDCRAFTEDHTML) {
+                locatedTests.add(test);
+            }
+        }
+
+        return locatedTests;
     }
 
 

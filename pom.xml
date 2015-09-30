@@ -12,7 +12,7 @@
     <groupId>com.cj.qunit.mojo</groupId>
     <artifactId>qunit-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.2-SNAPSHOT</version>
 
     <name>${project.artifactId}</name>
 
@@ -109,6 +109,16 @@
             <id>stu</id>
             <name>Stu Penrose</name>
             <email>stu@penrose.us</email>
+        </developer>
+        <developer>
+            <id>jshah</id>
+            <name>Jeegar Shah</name>
+            <email>jeegar@hotmail.com</email>
+        </developer>
+        <developer>
+            <id>erikfork</id>
+            <name>Erik Forkalsrud</name>
+            <email>erik@forkalsrud.org</email>
         </developer>
     </developers>
     <!-- END: STUFF REQUIRED BY THE CENTRAL REPO -->

@@ -2,10 +2,7 @@ package com.cj.qunit.mojo;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import junit.framework.Assert;
 
@@ -85,16 +82,16 @@ public class QunitMavenRunnerTest {
 
         write(projectDirectory, "src/main/whatever/a.js",
                 "define(function(){" +
-                "    return 'I am module a';" +
-                "});");
+                        "    return 'I am module a';" +
+                        "});");
 
         write(projectDirectory, "src/test/whatever/somedir/Whatever.qunit.js",
                 "require(['a'], function(a){" +
-                "    module('mytests');" +
-                "    test('mytest', function(){" +
-                "        equal(a, 'I am module a');" +
-                "    });" +
-                "});");
+                        "    module('mytests');" +
+                        "    test('mytest', function(){" +
+                        "        equal(a, 'I am module a');" +
+                        "    });" +
+                        "});");
 
         QunitMavenRunner runner = new QunitMavenRunner();
         FakeLog log = new FakeLog();
@@ -105,8 +102,8 @@ public class QunitMavenRunnerTest {
         try {
             problems = runner.run("/path/to/my/app/",
                                   Arrays.asList(
-                                            new File(projectDirectory, "src/main/whatever"),
-                                            new File(projectDirectory, "src/test/whatever")),
+                                          new File(projectDirectory, "src/main/whatever"),
+                                          new File(projectDirectory, "src/test/whatever")),
                                   null,
                                   Collections.<File>emptyList(), "/path/to/my/app/my-require-config.js", log, 5000, new JavaUtilLog());
             t = null;
@@ -365,6 +362,10 @@ public class QunitMavenRunnerTest {
             copyToDiskFromClasspath(srcMainHtmlDirectory, name);
         }
 
+        for(String name : new String[]{"SomeFailingQunitTest.html", "jquery-1.8.2.min.js", "qunit-1.11.0.css", "qunit-1.11.0.js"}){
+            copyToDiskFromClasspath(srcMainHtmlDirectory, name);
+        }
+
         QunitMavenRunner runner = new QunitMavenRunner();
         FakeLog log = new FakeLog();
 
@@ -382,9 +383,10 @@ public class QunitMavenRunnerTest {
         // then
         System.out.println(srcMainHtmlDirectory.getAbsolutePath());
         Assert.assertTrue("The plugin should not blow up", t == null);
-        Assert.assertEquals(0, problems.size());
-        Assert.assertEquals(1, log.pathsRun.size());
-        Assert.assertEquals("src/test/whatever/SomeQunitTest.html", log.pathsRun.get(0));
+        Assert.assertEquals(1, problems.size());
+        Assert.assertEquals(2, log.pathsRun.size());
+        Assert.assertTrue(log.pathsRun.contains("src/test/whatever/SomeQunitTest.html"));
+        Assert.assertTrue(log.pathsRun.contains("src/test/whatever/SomeFailingQunitTest.html"));
     }
 
 
