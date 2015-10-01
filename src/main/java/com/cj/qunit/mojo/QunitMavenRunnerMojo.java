@@ -1,6 +1,5 @@
 package com.cj.qunit.mojo;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
     /**
      * @parameter expression="${qunit.numThreads}"
      */
-    public Integer numThreads = 1;
+    public String numThreads = "1";
     
     /**
      * @parameter expression="${qunit.runner}" default-value=PHANTOMJS
@@ -81,8 +80,16 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
 
         
         final Runner runner = Runner.valueOf(this.runner.toUpperCase());
-        
-        final List<String> problems = new QunitMavenRunner(numThreads, runner, verbose, preserveTempFiles, retryCount).run(
+
+        Integer threads;
+        if (numThreads.endsWith("C")) {
+            int numCores = Runtime.getRuntime().availableProcessors();
+            threads = numCores * Integer.parseInt(numThreads.replace("C", ""));
+        } else {
+            threads = Integer.valueOf(numThreads);
+        }
+
+        final List<String> problems = new QunitMavenRunner(threads, runner, verbose, preserveTempFiles, retryCount).run(
                                             webRoot(), 
                                             codePaths(), 
                                             filterPattern,

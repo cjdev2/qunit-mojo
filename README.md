@@ -11,7 +11,7 @@ Goals:
 
 Options:
 
-* -Dqunit.numThreads=N -> executes qunit tests in parallel using N threads
+* -Dqunit.numThreads=N -> executes qunit tests in parallel using N threads, a 'C' suffix (e.g. 1C) will multiply by the number of cores on the system.
 * -Dqunit.filter=foo -> executes only those tests which have 'foo' in their name/path
 * -Dqunit.verbose=true/false -> logs verbose output for debugging (default=false)
 * -Dqunit.preserveTempFiles=true/false -> preserves generated temp files for with debugging (default=false)
