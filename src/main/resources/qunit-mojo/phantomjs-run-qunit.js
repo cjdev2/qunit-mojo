@@ -7,7 +7,7 @@ function versionCheck(){
 
     if(version.major < 1 || (version.major ===1 && version.minor < 9)){
         console.error("Required phantomjs >= 1.9.0, but found " + versionString);
-        phantom.exit(1);
+        exit(1);
     }
 }
 
@@ -20,7 +20,7 @@ function versionCheck(){
     
     if (args.length < 2 || args.length > 3) {
         console.error('Usage:\n  phantomjs runner.js [url-of-your-qunit-testsuite] [timeout-in-seconds]');
-        phantom.exit(1);
+        exit(1);
     }
 
     
@@ -54,14 +54,14 @@ function versionCheck(){
 //                page.render('target/surefire-reports/failure.jpg');
 //            }
 
-            phantom.exit(failed ? 1 : 0);
+            exit(failed ? 1 : 0);
         }
     };
 
     page.open(url, function (status) {
         if (status !== 'success') {
             console.error('Unable to access network: ' + status);
-            phantom.exit(1);
+            exit(1);
         } else {
             var qunitMissing = page.evaluate(function () {
                 return (typeof QUnit === 'undefined' || !QUnit);
@@ -69,14 +69,14 @@ function versionCheck(){
 
             if (qunitMissing) {
                 console.error('Test URL: ' + url + ' - The `QUnit` object is not present on this page.');
-                phantom.exit(1);
+                exit(1);
             }
 
             // Set a timeout on the test running, otherwise tests with async problems will hang forever
             if (typeof timeout === 'number') {
                 setTimeout(function () {
                     console.error('Test URL: ' + url + ' - The specified timeout of ' + timeout + ' ms has expired. Aborting...');
-                    phantom.exit(1);
+                    exit(1);
                 }, timeout);
             }
         }
@@ -117,4 +117,13 @@ function versionCheck(){
         }, false);
 
     }
+
+	function exit(code) {
+		if (page) {
+			page.close();
+		}
+		setTimeout(function () {
+			phantom.exit(code);
+		}, 0);
+	}
 })();
