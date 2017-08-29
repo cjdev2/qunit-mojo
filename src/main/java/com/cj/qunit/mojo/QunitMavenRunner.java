@@ -35,8 +35,67 @@ public class QunitMavenRunner {
                 page.assertTestsPass();
                 return null;
             }
-        }, 
+        },
         PHANTOMJS{
+
+            String runTest(
+                    final WebServerUtils.JettyPlusPortPlusScanner jetty,
+                    final LocatedTest test,
+                    final String name,  int testTimeout,
+                    final Listener listener,
+                    boolean verbose,
+                    boolean preserveTempFiles,
+                    int retryCount) {
+
+                try {
+                    String message = null;
+                    for (int run = 0; run <= retryCount; run++) {
+                        File f = File.createTempFile("phantomjs-run-qunit", ".js");
+
+                        if (!preserveTempFiles) { f.deleteOnExit(); }
+
+                        FileUtils.write(f, IOUtils.toString(getClass().getResourceAsStream("/qunit-mojo/phantomjs-run-qunit.js")));
+
+                        String baseUrl = "http://localhost:" + jetty.port;
+                        String url = baseUrl + "/" + test.relativePathToHtmlFile;
+                        String[] command = {
+                                "phantomjs",
+                                f.getAbsolutePath(),
+                                url,
+                                Integer.toString(testTimeout)};
+
+                        Process phantomjs = new ProcessBuilder().redirectErrorStream(true).command(command).start();
+
+                        String logMessage = "Executing " + mkString(command, " ");
+
+                        if (verbose) { listener.info(logMessage); } else { listener.debug(logMessage); }
+
+                        copyStreamAsyncOneByteAtATime(phantomjs.getInputStream(), System.out);
+                        copyStreamAsyncOneByteAtATime(phantomjs.getErrorStream(), System.err);
+
+                        final int exitCode = phantomjs.waitFor();
+
+                        logMessage = "Exit code " + exitCode + " for " + name;
+
+                        if (verbose) { listener.info(logMessage); } else { listener.debug(logMessage); }
+
+                        if (exitCode == 0) {
+                            return null;
+                        }
+                        if (exitCode < 128) {
+                            return "Problems found in " + name;
+                        }
+                        // apparently when exitCode is >128 phantomjs crashed with error exitCode-128  (e.g. 139-128=11 or SIGSEGV)
+                        message = "Problems found in " + name + " (Crash? " + exitCode + ")";
+                    }
+                    return message;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        },
+
+        CHROME{
             
             String runTest(
                     final WebServerUtils.JettyPlusPortPlusScanner jetty,
@@ -50,30 +109,33 @@ public class QunitMavenRunner {
                 try {
                     String message = null;
                     for (int run = 0; run <= retryCount; run++) {
-                        File f = File.createTempFile("phantomjs-run-qunit", ".js");
+                        File f = File.createTempFile("chrome-run-qunit", ".js");
 
                         if (!preserveTempFiles) { f.deleteOnExit(); }
 
-                        FileUtils.write(f, IOUtils.toString(getClass().getResourceAsStream("/qunit-mojo/phantomjs-run-qunit.js")));
+                        FileUtils.write(
+                                f,
+                                IOUtils.toString(getClass().getResourceAsStream("/qunit-mojo/chrome-run-qunit.js"))
+                        );
                     
                         String baseUrl = "http://localhost:" + jetty.port;
                         String url = baseUrl + "/" + test.relativePathToHtmlFile;
                         String[] command = {
-                                "phantomjs",
+                                "node",
                                 f.getAbsolutePath(),
                                 url,
                                 Integer.toString(testTimeout)};
                     
-                        Process phantomjs = new ProcessBuilder().redirectErrorStream(true).command(command).start();
+                        Process chrome = new ProcessBuilder().redirectErrorStream(true).command(command).start();
 
                         String logMessage = "Executing " + mkString(command, " ");
 
                         if (verbose) { listener.info(logMessage); } else { listener.debug(logMessage); }
                     
-                        copyStreamAsyncOneByteAtATime(phantomjs.getInputStream(), System.out);
-                        copyStreamAsyncOneByteAtATime(phantomjs.getErrorStream(), System.err);
+                        copyStreamAsyncOneByteAtATime(chrome.getInputStream(), System.out);
+                        copyStreamAsyncOneByteAtATime(chrome.getErrorStream(), System.err);
                     
-                        final int exitCode = phantomjs.waitFor();
+                        final int exitCode = chrome.waitFor();
 
                         logMessage = "Exit code " + exitCode + " for " + name;
                     
