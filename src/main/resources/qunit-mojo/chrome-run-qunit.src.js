@@ -11,20 +11,25 @@ let [node, theScript, url, timeout, ...args] = process.argv;
 // start a headless Chrome process
 Chrome.start().then(chrome => {
     let page = new Tab({
-        verbose: true,
+        verbose: false,
         failonerror: false
     });
-    page.on('console', msg => console.error(msg));
+    page.on('testFailure', ({data}) => console.error(data));
     page.on('load', () => page.execute(addLogging));
 
     function addLogging() {
         QUnit.done(function (result) {
-            console.log('\n' + 'Took ' + result.runtime + 'ms to run ' + result.total + ' tests. ' + result.passed + ' passed, ' + result.failed + ' failed.');
+            let doneMessage =  "Test URL: " + window.document.URL
+                +', Tests run: ' + result.total
+                + ', Passed: ' + result.passed
+                + ', Failures: ' + result.failed
+                + ', Time elapsed: ' + result.runtime + " ms"
+                + (isFailure ? " <<< FAILURE!" : "");
 
             if (typeof window.__chromate === 'function') {
                 window.__chromate({
                     event: 'done',
-                    data: result
+                    data: Object.assign({}, result, {message: doneMessage})
                 });
             }
         });
@@ -33,7 +38,6 @@ Chrome.start().then(chrome => {
             if (false === assertion.result) {
 
                 var failureMessage = "*** Assertion FAILED!! Test URL: " + window.document.URL + " Test: [" + assertion.name + "]";
-
                 if (assertion.message) {
                     failureMessage += " Message: [" + assertion.message + "]";
                 }
@@ -42,12 +46,17 @@ Chrome.start().then(chrome => {
                     failureMessage += " Expected: [" + assertion.expected + "] Actual: [" + assertion.actual + "]";
                 }
 
+                if (typeof window.__chromate === 'function') {
+                    window.__chromate({
+                        event: 'testFailure',
+                        data: { failureMessage, assertion }
+                    })
+                }
+
                 console.error(failureMessage);
             }
         });
     }
-
-    page.on('done', handleResult);
 
     function handleResult(message) {
         var result, failed;
@@ -57,11 +66,19 @@ Chrome.start().then(chrome => {
                 failed = !result || !result.total || result.failed;
                 if (!result.total) {
                     console.error('No tests were executed. Are you loading tests asynchronously?');
+                } else {
+                    console.log(result.message);
                 }
-                process.exit(failed ? 1 : 0);
+
+                page.close().then( () => {
+                        Chrome.kill(chrome);
+                        process.exit(failed ? 1 : 0);
+                    }
+                );
             }
         }
     }
+    page.on('done', handleResult);
 
     console.log(url);
     page.open(url)

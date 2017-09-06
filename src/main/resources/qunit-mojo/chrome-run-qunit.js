@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 'use strict';
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
@@ -17,22 +16,18 @@ var path = _interopDefault(require('path'));
 var os = _interopDefault(require('os'));
 var assert = _interopDefault(require('assert'));
 
-var _args = [[{"raw":"chromate","scope":null,"escapedName":"chromate","name":"chromate","rawSpec":"","spec":"latest","type":"tag"},"/Users/elangley/git_repos/qunit-mojo/src/main/resources/qunit-mojo"]];
+var _args = [[{"raw":"chromate@https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz","scope":null,"escapedName":"chromate","name":"chromate","rawSpec":"https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz","spec":"https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz","type":"remote"},"/Users/elangley/git_repos/qunit-mojo/src/main/resources/qunit-mojo"]];
 var _from = "chromate@latest";
 var _id = "chromate@0.3.5";
 var _inCache = true;
 var _location = "/chromate";
-var _nodeVersion = "7.3.0";
-var _npmOperationalInternal = {"host":"s3://npm-registry-packages","tmp":"tmp/chromate-0.3.5.tgz_1495640883839_0.9807845226023346"};
-var _npmUser = {"name":"moos","email":"mooster@42at.com"};
-var _npmVersion = "4.2.0";
 var _phantomChildren = {};
-var _requested = {"raw":"chromate","scope":null,"escapedName":"chromate","name":"chromate","rawSpec":"","spec":"latest","type":"tag"};
-var _requiredBy = ["#USER","/"];
+var _requested = {"raw":"chromate@https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz","scope":null,"escapedName":"chromate","name":"chromate","rawSpec":"https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz","spec":"https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz","type":"remote"};
+var _requiredBy = ["/"];
 var _resolved = "https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz";
 var _shasum = "7431850dfbc5e50c7fe8316421f43e01933b8645";
 var _shrinkwrap = null;
-var _spec = "chromate";
+var _spec = "chromate@https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz";
 var _where = "/Users/elangley/git_repos/qunit-mojo/src/main/resources/qunit-mojo";
 var author = {"name":"Moos"};
 var bin = {"chromate":"bin/cli.js"};
@@ -40,17 +35,14 @@ var bugs = {"url":"https://github.com/moos/chromate/issues"};
 var dependencies = {"chrome-remote-interface":"^0.21.0","chrome-unmirror":"^0.1.0","ps-moos":"~0.1.6-moos","rimraf":"^2.6.1"};
 var description = "A mate for your Headless Chrome, mate.";
 var devDependencies = {};
-var directories = {};
-var dist = {"shasum":"7431850dfbc5e50c7fe8316421f43e01933b8645","tarball":"https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz"};
-var gitHead = "a11693da690905a22e52febaa17b9f96d7d44f3f";
 var homepage = "https://github.com/moos/chromate#readme";
 var keywords = ["chrome","headless"];
 var license = "MIT";
 var main = "index.js";
-var maintainers = [{"name":"moos","email":"mooster@42at.com"}];
 var name = "chromate";
 var optionalDependencies = {};
-var readme = "ERROR: No README data found!";
+var readme = "Automate [Headless Chrome](https://www.chromestatus.com/feature/5678767817097216) -- start/stop \n Chrome instances, open & close tabs, and _communicate_ with the target page.\n\n### Compatibility \n- You must use version >= 59 of Chrome (currently that means [Chrome Beta](https://www.google.com/chrome/browser/beta.html)) or use [Chrome Canary](https://www.google.com/chrome/browser/canary.html).\n- Canary isn't supported on Linux platform.\n\n## Install\n```shell\nnpm install chromate\nnpm run sample\n```\n\n## Use\n```js\nlet {Chrome, Tab} = require('chromate');\n\n// start a headless Chrome process\nChrome.start().then(chrome => {\n  let tab = new Tab({\n    verbose: true,\n    failonerror: false\n  });\n  \n  tab.open(targetUrl)\n  .then(() => tab.evaluate('testResults'))\n  .then(res => console.log) // results...\n  .then(() => tab.close())\n  .then(() => {\n    Chrome.kill(chrome);\n    process.exit(0);\n  });\n});\n```\n\n### Page events\nHandle events, including any [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface#class-cdp) events.\n```js\nnew Tab(options)\n .on('ready', (tab) => console.log('tab is ready', tab.client.target.id))\n .on('load', () => console.log('page loaded'))\n .on('console', (args) => console.log('console.* called', args))\n .on('Network.requestWillBeSent', param => console.log('Getting resource', param.request.url))\n .once('Runtime.consoleAPICalled', param => console.log('Runtime.consoleAPICalled called', param))\n .open(targetUrl);\n```\nThe `ready` event is fired once when the target client is ready (this overrides the CDP `ready` event).  The target may\nfire any number of custom events.\n\n### Custom events\nA target page may communicate back to the controlling process by calling `console.debug(message)`, \nwhere `message`  is `{event, data}`.   This is useful for running automated tests, such as for\nreplacing [PhantomJS](http://phantomjs.org/).  See [phantom-menace](https://github.com/moos/phantom-menace) for  example.\n```js\n// useful for short messages (< 100 chars)\nconsole.debug({\n  event: 'done',\n  data: JSON.stringify({foo: 1}) // must be stringify'd\n});\n\n// then, in runner process\nnew Tab()\n  .on('done', res => console.log); // {event: 'done', data: foo:1}}\n```\nA special function `__chromate(message)` is injected in target \npage to facilitate this, so that the above can be replaced by:\n```js\n// in target (useful for any length message)\nif (window.__chromate) __chromate({event: 'done', data: {foo:1}});;\n```\n\nThe format of the message is flexible, but should be sensible.  If no `event` property is found in the message,\na 'data' event is triggered.\n```js\n// in target\n__chromate('foo');\nconsole.debug({a:1});\n\n// in runner\ntab.on('data', res => console.log); // 'foo' and {a:1}\n```\n\n### Script injection\nOften it's useful for the running script to inject custom JS into the target page.  This can \n  be done thorough [Page.addScriptToEvaluateOnLoad()](https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-addScriptToEvaluateOnLoad)\n  or the [Runtime.evaluate()](https://chromedevtools.github.io/devtools-protocol/tot/Runtime/#method-evaluate) method. \nTwo helper methods are provided: `tab.evaluate()` and `tab.execute()`:\n```js\nnew Tab()\n  .on('done', (res, tab) => {\n     tab.evaluate('JSON.stringify(__coverage__)')\n       .then(result => console.log(result))\n       .then(() => tab.close());\n  })\n  .open(targetUrl);\n```\nOr execute a (named) function in target.\n```js\nnew Tab()\n  .open(targetUrl)\n  .then(tab => {\n    tab.execute('getResult').then(res => console.log);\n  })\n  \n// in target\nfunction getResult() {\n  return JSON.stringify(result);\n}\n```\n`tab.execute()` takes additional parameters to pass as arguments to the function.\nIf the function is expected to return a Promise, pass a `{awaitPromise: true}` as the\nlast argument.\n\n## API\n\nSee [API docs](./api.md).\n\n\n## Simple CLI\nUsage:\n```shell\n$ chromate\nUsage: chromate start [<chrome flags>] | list | kill <pid> ... | killall | version | open <url> | \n    list-tabs | close <tabId> | close-tabs  [--canary | --verbose | -v]\n```\n\n### Chrome process control\n```shell\n$ chromate start --window-size=800x600 --canary\n42706: /Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary\n  --remote-debugging-port=9222 --headless --disable-gpu\n  --user-data-dir=/var/folders/jl/zr54cdxs08l1djw8s4ws2t540000gn/T/chrome-PdvzfF \n  --window-size=800x600 --canary --disable-translate --disable-extensions\n  --disable-background-networking --safebrowsing-disable-auto-update --disable-sync\n  --metrics-recording-only --disable-default-apps --no-first-run \n  --disable-background-timer-throttling --disable-renderer-backgrounding\n  --disable-device-discovery-notifications\n\n$ chromate list\n[ { pid: '42706',\n    command: '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',\n    arguments:\n     [ '--remote-debugging-port=9222',\n       '--headless',\n       '--disable-gpu',\n       '--user-data-dir=/var/folders/jl/zr54cdxs08l1djw8s4ws2t540000gn/T/chrome-PdvzfF',\n       '--window-size=800x600',\n       '--canary',\n       '--disable-translate',\n       '--disable-extensions',\n       '--disable-background-networking',\n       '--safebrowsing-disable-auto-update',\n       '--disable-sync',\n       '--metrics-recording-only',\n       '--disable-default-apps',\n       '--no-first-run',\n       '--disable-background-timer-throttling',\n       '--disable-renderer-backgrounding',\n       '--disable-device-discovery-notifications' ],\n    ppid: '1' } ]\n    \n$ chromate killall \n2\n```\n`killall` returns the number of processes (including sub-processes) killed.\n\nFor list of Chrome _Headless_ flags, [see here](https://cs.chromium.org/chromium/src/headless/app/headless_shell_switches.cc). Of course, [any Chrome flag](http://peter.sh/experiments/chromium-command-line-switches/) can be specified.\n\nTo use a custom Chrome path and/or port, use:\n```shell\n$ CHROME_BIN=/path/to/chrome CHROME_PORT=9226 chromate start\n```\n\n### Chrome tab control\n```shell\n$ chromate open https://github.com\n{ description: '',\n  devtoolsFrontendUrl: '/devtools/inspector.html?ws=localhost:9222/devtools/page/904ddfa4-2344-4e45-a625-8261ffbee251',\n  id: '904ddfa4-2344-4e45-a625-8261ffbee251',\n  title: '',\n  type: 'page',\n  url: 'about:blank',\n  webSocketDebuggerUrl: 'ws://localhost:9222/devtools/page/904ddfa4-2344-4e45-a625-8261ffbee251' }\n\n$ chromate list-tabs\n[ { description: '',\n    devtoolsFrontendUrl: '/devtools/inspector.html?ws=localhost:9222/devtools/page/e97b0e1e-1fb5-41be-83d2-bdb9fbc406bc',\n    id: 'e97b0e1e-1fb5-41be-83d2-bdb9fbc406bc',\n    title: 'The world&#39;s leading software development platform · GitHub',\n    type: 'page',\n    url: 'https://github.com/',\n    webSocketDebuggerUrl: 'ws://localhost:9222/devtools/page/e97b0e1e-1fb5-41be-83d2-bdb9fbc406bc' },\n  { description: '',\n    devtoolsFrontendUrl: '/devtools/inspector.html?ws=localhost:9222/devtools/page/e4c16358-7670-4deb-8b2e-29f802e599a3',\n    id: 'e4c16358-7670-4deb-8b2e-29f802e599a3',\n    title: 'about:blank',\n    type: 'page',\n    url: 'about:blank',\n    webSocketDebuggerUrl: 'ws://localhost:9222/devtools/page/e4c16358-7670-4deb-8b2e-29f802e599a3' } ]\n\n$ chromate close-tabs\n2\n```\n\n## Test\n```shell\n# npm i -g mocha  (if you don't already have it)\nnpm test\n```\n\n\n## Thanks and references\n- This library is based on the awesome work of [chrome-remote-interface](https://www.npmjs.com/package/chrome-remote-interface)\n- Idea for Chrome.ready() taken from [Lighthouse](https://github.com/GoogleChrome/lighthouse)\n- [DevTools Protocol Viewer](https://chromedevtools.github.io/devtools-protocol/) complete reference.\n- [Getting Started with Headless Chrome](https://developers.google.com/web/updates/2017/04/headless-chrome)\n\n## Change log\n\n- v0.3.5 - Readme update.\n- v0.3.4 - Added Chrome.settings.userDataDir.  By default a temporary user data dir is used and cleaned up.  \n- v0.3.3 - fixed 'ps-node' reference\n- v0.3.2 - fixed internal print() method\n- v0.3.1 - added events 'abort', 'exception', and 'console.*'.  Export chromate.version.\n- v0.3.0 - tab.open(url) takes url rather than constructor.  tab.execute can take a local function.  Use ps-moos with fix for spaces in path.\n- v0.2.0 - Added expression and function evaluation and __chromate global for general message passing.  Events now get complete message, not just the data part. (May 2017)\n- v0.1.x - Initial version (May 2017)\n\n## License\nMIT\n";
+var readmeFilename = "README.md";
 var repository = {"type":"git","url":"git+https://github.com/moos/chromate.git"};
 var scripts = {"docs":"jsdoc -R README.md src","docs-api":"jsdoc2md src/* > api.md","sample":"node sample/main","test":"mocha test"};
 var version = "0.3.5";
@@ -60,10 +52,6 @@ var _package = {
 	_id: _id,
 	_inCache: _inCache,
 	_location: _location,
-	_nodeVersion: _nodeVersion,
-	_npmOperationalInternal: _npmOperationalInternal,
-	_npmUser: _npmUser,
-	_npmVersion: _npmVersion,
 	_phantomChildren: _phantomChildren,
 	_requested: _requested,
 	_requiredBy: _requiredBy,
@@ -78,17 +66,14 @@ var _package = {
 	dependencies: dependencies,
 	description: description,
 	devDependencies: devDependencies,
-	directories: directories,
-	dist: dist,
-	gitHead: gitHead,
 	homepage: homepage,
 	keywords: keywords,
 	license: license,
 	main: main,
-	maintainers: maintainers,
 	name: name,
 	optionalDependencies: optionalDependencies,
 	readme: readme,
+	readmeFilename: readmeFilename,
 	repository: repository,
 	scripts: scripts,
 	version: version
@@ -100,10 +85,6 @@ var _package$1 = Object.freeze({
 	_id: _id,
 	_inCache: _inCache,
 	_location: _location,
-	_nodeVersion: _nodeVersion,
-	_npmOperationalInternal: _npmOperationalInternal,
-	_npmUser: _npmUser,
-	_npmVersion: _npmVersion,
 	_phantomChildren: _phantomChildren,
 	_requested: _requested,
 	_requiredBy: _requiredBy,
@@ -118,17 +99,14 @@ var _package$1 = Object.freeze({
 	dependencies: dependencies,
 	description: description,
 	devDependencies: devDependencies,
-	directories: directories,
-	dist: dist,
-	gitHead: gitHead,
 	homepage: homepage,
 	keywords: keywords,
 	license: license,
 	main: main,
-	maintainers: maintainers,
 	name: name,
 	optionalDependencies: optionalDependencies,
 	readme: readme,
+	readmeFilename: readmeFilename,
 	repository: repository,
 	scripts: scripts,
 	version: version,
@@ -9725,20 +9703,25 @@ let [node, theScript, url$1, timeout, ...args] = process.argv;
 // start a headless Chrome process
 Chrome.start().then(chrome => {
     let page = new Tab({
-        verbose: true,
+        verbose: false,
         failonerror: false
     });
-    page.on('console', msg => console.error(msg));
+    page.on('testFailure', ({data}) => console.error(data));
     page.on('load', () => page.execute(addLogging));
 
     function addLogging() {
         QUnit.done(function (result) {
-            console.log('\n' + 'Took ' + result.runtime + 'ms to run ' + result.total + ' tests. ' + result.passed + ' passed, ' + result.failed + ' failed.');
+            let doneMessage =  "Test URL: " + window.document.URL
+                +', Tests run: ' + result.total
+                + ', Passed: ' + result.passed
+                + ', Failures: ' + result.failed
+                + ', Time elapsed: ' + result.runtime + " ms"
+                + (isFailure ? " <<< FAILURE!" : "");
 
             if (typeof window.__chromate === 'function') {
                 window.__chromate({
                     event: 'done',
-                    data: result
+                    data: Object.assign({}, result, {message: doneMessage})
                 });
             }
         });
@@ -9747,7 +9730,6 @@ Chrome.start().then(chrome => {
             if (false === assertion.result) {
 
                 var failureMessage = "*** Assertion FAILED!! Test URL: " + window.document.URL + " Test: [" + assertion.name + "]";
-
                 if (assertion.message) {
                     failureMessage += " Message: [" + assertion.message + "]";
                 }
@@ -9756,12 +9738,17 @@ Chrome.start().then(chrome => {
                     failureMessage += " Expected: [" + assertion.expected + "] Actual: [" + assertion.actual + "]";
                 }
 
+                if (typeof window.__chromate === 'function') {
+                    window.__chromate({
+                        event: 'testFailure',
+                        data: { failureMessage, assertion }
+                    });
+                }
+
                 console.error(failureMessage);
             }
         });
     }
-
-    page.on('done', handleResult);
 
     function handleResult(message) {
         var result, failed;
@@ -9771,11 +9758,19 @@ Chrome.start().then(chrome => {
                 failed = !result || !result.total || result.failed;
                 if (!result.total) {
                     console.error('No tests were executed. Are you loading tests asynchronously?');
+                } else {
+                    console.log(result.message);
                 }
-                process.exit(failed ? 1 : 0);
+
+                page.close().then( () => {
+                        Chrome.kill(chrome);
+                        process.exit(failed ? 1 : 0);
+                    }
+                );
             }
         }
     }
+    page.on('done', handleResult);
 
     console.log(url$1);
     page.open(url$1)
