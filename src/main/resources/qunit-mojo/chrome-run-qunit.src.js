@@ -14,11 +14,14 @@ Chrome.start().then(chrome => {
         verbose: false,
         failonerror: false
     });
-    page.on('testFailure', ({data}) => console.error(data));
+    page.on('testFailure', ({data}) => console.error(data.failureMessage));
     page.on('load', () => page.execute(addLogging));
+    // page.on('console', (data) => console.log(data));
 
     function addLogging() {
         QUnit.done(function (result) {
+            let isFailure = (result.total === 0 || result.failed);
+
             let doneMessage =  "Test URL: " + window.document.URL
                 +', Tests run: ' + result.total
                 + ', Passed: ' + result.passed
@@ -42,7 +45,7 @@ Chrome.start().then(chrome => {
                     failureMessage += " Message: [" + assertion.message + "]";
                 }
 
-                if (assertion.expected) {
+                if (assertion.hasOwnProperty('expected')) {
                     failureMessage += " Expected: [" + assertion.expected + "] Actual: [" + assertion.actual + "]";
                 }
 
