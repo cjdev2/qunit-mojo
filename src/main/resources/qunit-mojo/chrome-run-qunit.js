@@ -9700,6 +9700,10 @@ let {
 
 let [node, theScript, url$1, timeout, ...args] = process.argv;
 
+// if (typeof timeout !== 'number') {
+//     timeout = 5000;
+// }
+
 // start a headless Chrome process
 Chrome.start().then(chrome => {
     let page = new Tab({
@@ -9711,6 +9715,7 @@ Chrome.start().then(chrome => {
     // page.on('console', (data) => console.log(data));
 
     function addLogging() {
+
         QUnit.done(function (result) {
             let isFailure = (result.total === 0 || result.failed);
 
