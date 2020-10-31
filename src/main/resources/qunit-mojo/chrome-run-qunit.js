@@ -15,6 +15,10 @@ var fs = _interopDefault(require('fs'));
 var path = _interopDefault(require('path'));
 var os = _interopDefault(require('os'));
 var assert = _interopDefault(require('assert'));
+var process$1 = _interopDefault(require('process'));
+var readline = _interopDefault(require('readline'));
+var stream = _interopDefault(require('stream'));
+var string_decoder = _interopDefault(require('string_decoder'));
 
 var _args = [[{"raw":"chromate@https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz","scope":null,"escapedName":"chromate","name":"chromate","rawSpec":"https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz","spec":"https://registry.npmjs.org/chromate/-/chromate-0.3.5.tgz","type":"remote"},"/Users/elangley/git_repos/qunit-mojo/src/main/resources/qunit-mojo"]];
 var _from = "chromate@latest";
@@ -9690,37 +9694,197 @@ var chromate = {
 
 };
 
+var through_1 = createCommonjsModule(function (module, exports) {
+// through
+//
+// a stream that does nothing but re-emit the input.
+// useful for aggregating a series of changing but not ending streams into one stream)
+
+exports = module.exports = through;
+through.through = through;
+
+//create a readable writable stream.
+
+function through (write, end, opts) {
+  write = write || function (data) { this.queue(data); };
+  end = end || function () { this.queue(null); };
+
+  var ended = false, destroyed = false, buffer = [], _ended = false;
+  var stream$$1 = new stream();
+  stream$$1.readable = stream$$1.writable = true;
+  stream$$1.paused = false;
+
+//  stream.autoPause   = !(opts && opts.autoPause   === false)
+  stream$$1.autoDestroy = !(opts && opts.autoDestroy === false);
+
+  stream$$1.write = function (data) {
+    write.call(this, data);
+    return !stream$$1.paused
+  };
+
+  function drain() {
+    while(buffer.length && !stream$$1.paused) {
+      var data = buffer.shift();
+      if(null === data)
+        return stream$$1.emit('end')
+      else
+        stream$$1.emit('data', data);
+    }
+  }
+
+  stream$$1.queue = stream$$1.push = function (data) {
+//    console.error(ended)
+    if(_ended) return stream$$1
+    if(data === null) _ended = true;
+    buffer.push(data);
+    drain();
+    return stream$$1
+  };
+
+  //this will be registered as the first 'end' listener
+  //must call destroy next tick, to make sure we're after any
+  //stream piped from here.
+  //this is only a problem if end is not emitted synchronously.
+  //a nicer way to do this is to make sure this is the last listener for 'end'
+
+  stream$$1.on('end', function () {
+    stream$$1.readable = false;
+    if(!stream$$1.writable && stream$$1.autoDestroy)
+      process.nextTick(function () {
+        stream$$1.destroy();
+      });
+  });
+
+  function _end () {
+    stream$$1.writable = false;
+    end.call(stream$$1);
+    if(!stream$$1.readable && stream$$1.autoDestroy)
+      stream$$1.destroy();
+  }
+
+  stream$$1.end = function (data) {
+    if(ended) return
+    ended = true;
+    if(arguments.length) stream$$1.write(data);
+    _end(); // will emit or queue
+    return stream$$1
+  };
+
+  stream$$1.destroy = function () {
+    if(destroyed) return
+    destroyed = true;
+    ended = true;
+    buffer.length = 0;
+    stream$$1.writable = stream$$1.readable = false;
+    stream$$1.emit('close');
+    return stream$$1
+  };
+
+  stream$$1.pause = function () {
+    if(stream$$1.paused) return
+    stream$$1.paused = true;
+    return stream$$1
+  };
+
+  stream$$1.resume = function () {
+    if(stream$$1.paused) {
+      stream$$1.paused = false;
+      stream$$1.emit('resume');
+    }
+    drain();
+    //may have become paused again,
+    //as drain emits 'data'.
+    if(!stream$$1.paused)
+      stream$$1.emit('drain');
+    return stream$$1
+  };
+  return stream$$1
+}
+});
+
+//filter will reemit the data if cb(err,pass) pass is truthy
+
+// reduce is more tricky
+// maybe we want to group the reductions or emit progress updates occasionally
+// the most basic reduce just emits one 'data' event after it has recieved 'end'
+
+
+
+var Decoder = string_decoder.StringDecoder;
+
+var split_1 = split;
+
+//TODO pass in a function to map across the lines.
+
+function split (matcher, mapper, options) {
+  var decoder = new Decoder();
+  var soFar = '';
+  var maxLength = options && options.maxLength;
+  var trailing = options && options.trailing === false ? false : true;
+  if('function' === typeof matcher)
+    mapper = matcher, matcher = null;
+  if (!matcher)
+    matcher = /\r?\n/;
+
+  function emit(stream$$1, piece) {
+    if(mapper) {
+      try {
+        piece = mapper(piece);
+      }
+      catch (err) {
+        return stream$$1.emit('error', err)
+      }
+      if('undefined' !== typeof piece)
+        stream$$1.queue(piece);
+    }
+    else
+      stream$$1.queue(piece);
+  }
+
+  function next (stream$$1, buffer) {
+    var pieces = ((soFar != null ? soFar : '') + buffer).split(matcher);
+    soFar = pieces.pop();
+
+    if (maxLength && soFar.length > maxLength)
+      return stream$$1.emit('error', new Error('maximum buffer reached'))
+
+    for (var i = 0; i < pieces.length; i++) {
+      var piece = pieces[i];
+      emit(stream$$1, piece);
+    }
+  }
+
+  return through_1(function (b) {
+    next(this, decoder.write(b));
+  },
+  function () {
+    if(decoder.end)
+      next(this, decoder.end());
+    if(trailing && soFar != null)
+      emit(this, soFar);
+    this.queue(null);
+  })
+}
+
 // url timeout
 let {
     Chrome,
     Tab
 } = chromate;
 
-// let url, page, timeout, args = require('system').args;
 
-let [node, theScript, url$1, timeout, ...args] = process.argv;
 
-// if (typeof timeout !== 'number') {
-//     timeout = 5000;
-// }
+
 
 // start a headless Chrome process
 Chrome.start().then(chrome => {
-    let page = new Tab({
-        verbose: false,
-        failonerror: false
-    });
-    page.on('testFailure', ({data}) => console.error(data.failureMessage));
-    page.on('load', () => page.execute(addLogging));
-    // page.on('console', (data) => console.log(data));
-
     function addLogging() {
 
         QUnit.done(function (result) {
             let isFailure = (result.total === 0 || result.failed);
 
-            let doneMessage =  "Test URL: " + window.document.URL
-                +', Tests run: ' + result.total
+            let doneMessage = "Test URL: " + window.document.URL
+                + ', Tests run: ' + result.total
                 + ', Passed: ' + result.passed
                 + ', Failures: ' + result.failed
                 + ', Time elapsed: ' + result.runtime + " ms"
@@ -9749,7 +9913,7 @@ Chrome.start().then(chrome => {
                 if (typeof window.__chromate === 'function') {
                     window.__chromate({
                         event: 'testFailure',
-                        data: { failureMessage, assertion }
+                        data: {failureMessage, assertion}
                     });
                 }
 
@@ -9758,43 +9922,68 @@ Chrome.start().then(chrome => {
         });
     }
 
-    function handleResult(message) {
-        var result, failed;
+    let handleResultWithPage = (page) => function handleResult(message) {
+        var result;
         if (message) {
             if (message.event === 'done') {
                 result = message.data;
-                failed = !result || !result.total || result.failed;
                 if (!result.total) {
                     console.error('No tests were executed. Are you loading tests asynchronously?');
                 } else {
                     console.log(result.message);
                 }
-
-                page.close().then( () => {
-                        Chrome.kill(chrome);
-                        process.exit(failed ? 1 : 0);
-                    }
-                );
             }
         }
-    }
-    page.on('done', handleResult);
+    };
 
-    console.log(url$1);
-    page.open(url$1)
-        .then(() => page.evaluate('typeof QUnit').then(res => {
-            if (res === 'undefined') {
-                console.log('QUnit not found');
-                page.close().then( () => {
-                        Chrome.kill(chrome);
-                        process.exit();
+    let pages = [];
+    process$1.stdin.pipe(split_1(/\r?\n/)).on('data', file => {
+        if (file.trim() !== "") {
+            let page = new Tab({
+                verbose: false,
+                failonerror: false
+            });
+            page.on('testFailure', ({data}) => console.error(data.failureMessage));
+            page.on('load', () => page.execute(addLogging));
+            // page.on('console', (data) => console.log(data));
+
+            let partitionval = file.match(/(test[/]+)javascript/);
+            let partitionidx = partitionval.index + partitionval[1].length;
+            let testPath = file.slice(partitionidx);
+            let url$$1 = `http://localhost:8098/qunit-mojo/${testPath}`;
+            console.log(url$$1);
+
+            page.open(url$$1)
+                .then(() => page.evaluate('typeof QUnit').then(res => {
+                    if (res === 'undefined') {
+                        console.log('QUnit not found');
                     }
-                );
-            }
-        }))
-        .catch(err => console.log('Tab.open error', err));
+                }))
+                .catch(err => {
+                    console.log('Tab.open error', err);
+                });
 
+            let thePromise = new Promise(
+                (resolve, reject) => {
+                    page.on('done', (message) => {
+                        handleResultWithPage(page)(message);
+                        page.close();
+                        resolve();
+                    });
+                }
+            );
 
+            pages.push(thePromise);
+        }
+    });
+
+    process$1.stdin.on('end', () => {
+        Promise.all(pages).then(() => {
+            console.log('exiting');
+            Chrome.kill();
+            process$1.exit();
+        });
+    });
 });
 
 var chromeRunQunit_src = {
