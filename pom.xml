@@ -12,7 +12,7 @@
     <groupId>com.cj.qunit.mojo</groupId>
     <artifactId>qunit-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>3.0.5-SNAPSHOT</version>
+    <version>3.0.6-SNAPSHOT</version>
 
     <name>${project.artifactId}</name>
 
@@ -21,14 +21,14 @@
             <id>snapshots</id>
             <uniqueVersion>true</uniqueVersion>
             <name>Nexus Repository</name>
-            <url>dav:http://deployment:deployment123@build105.wl.cj.com:8081/nexus/content/repositories/snapshots</url>
+            <url>https://deployment:deployment123@nexus.cj.dev/repository/maven-snapshots/</url>
         </snapshotRepository>
 
         <repository>
             <id>releases</id>
             <uniqueVersion>true</uniqueVersion>
             <name>Nexus Repository</name>
-            <url>dav:http://deployment:deployment123@build105.wl.cj.com:8081/nexus/content/repositories/releases</url>
+            <url>https://deployment:deployment123@nexus.cj.dev/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 

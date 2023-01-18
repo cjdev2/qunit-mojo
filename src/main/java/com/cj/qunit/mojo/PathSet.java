@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.cj.qunit.mojo.fs.FilesystemFunctions;
-import com.cj.qunit.mojo.fs.FilesystemFunctions.FileVisitor;
-
 public class PathSet {
     private final List<File> paths;
 
@@ -30,15 +27,15 @@ public class PathSet {
         }
     }
     
-    public static interface Visitor {
+    public interface Visitor {
         void visit(File root, File child);
     }
     
-    public void scanFiles(Visitor visitor){
+    public void scanFiles(List<String> dirsToExclude, Visitor visitor){
         List<FileFound> locations = new ArrayList<FileFound>();
         for(File path : paths){
             System.out.println("Scanning path: " + path.getAbsolutePath());
-            collectDirs(path, path, locations);
+            collectDirs(path, path, locations, dirsToExclude);
         }
         
         Set<File> files = new TreeSet<File>(new Comparator<File>() {
@@ -72,11 +69,11 @@ public class PathSet {
         }
     }
     
-    private void collectDirs(File root, File d, List<FileFound> locations){
+    private void collectDirs(File root, File d, List<FileFound> locations, List<String> dirsToExclude){
         if(d.isDirectory()){
             for(File child : d.listFiles()){
-                if(child.isDirectory()){
-                    collectDirs(root, child, locations);
+                if(child.isDirectory() && !dirsToExclude.contains(child.getName())){
+                    collectDirs(root, child, locations, dirsToExclude);
                 }else if(child.isFile()){
                     locations.add(new FileFound(root, child));
                 }

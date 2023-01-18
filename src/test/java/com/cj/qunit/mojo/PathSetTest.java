@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class PathSetTest {
         
         // when
         final List<File> rootsScanned = new ArrayList<File>();
-        paths.scanFiles(new PathSet.Visitor() {
+        paths.scanFiles(Collections.<String>emptyList(), new PathSet.Visitor() {
             
             @Override
             public void visit(File dir, File path) {

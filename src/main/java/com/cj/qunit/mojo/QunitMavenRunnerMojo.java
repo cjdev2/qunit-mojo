@@ -97,7 +97,8 @@ public class QunitMavenRunnerMojo extends AbstractQunitMojo {
                                             webPathToRequireDotJsConfig(), 
                                             listener, 
                                             returnTimeout(),
-                                            new JettyMavenLogger("foobar", getLog()));
+                                            new JettyMavenLogger("foobar", getLog()),
+                                            dirsToExclude());
         
         if(!problems.isEmpty()){
             StringBuilder problemsString = new StringBuilder();

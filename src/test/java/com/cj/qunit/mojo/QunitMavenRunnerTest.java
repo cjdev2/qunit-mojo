@@ -25,8 +25,9 @@ public class QunitMavenRunnerTest {
 				        "    }                                            "+
 				        "},	                                              ";
 
-	
-	
+
+    List<String> dirsToExclude = Collections.emptyList();
+
     private static void write(File baseDir, String path, String content){
         try {
             File where = new File(baseDir, path);
@@ -53,7 +54,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Exception t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog(),dirsToExclude);
             t = null;
         } catch (Exception e) {
             t = e;
@@ -105,7 +106,7 @@ public class QunitMavenRunnerTest {
                                           new File(projectDirectory, "src/main/whatever"),
                                           new File(projectDirectory, "src/test/whatever")),
                                   null,
-                                  Collections.<File>emptyList(), "/path/to/my/app/my-require-config.js", log, 5000, new JavaUtilLog());
+                                  Collections.<File>emptyList(), "/path/to/my/app/my-require-config.js", log, 5000, new JavaUtilLog(), dirsToExclude);
             t = null;
         } catch (Exception e) {
             t = e;
@@ -156,7 +157,7 @@ public class QunitMavenRunnerTest {
                                                 new File(projectDirectory, "src/main/whatever"),
                                                 new File(projectDirectory, "src/test/whatever")),
                                       null,
-                                      Collections.<File>emptyList(), nullPath, log, 5000, new JavaUtilLog());
+                                      Collections.<File>emptyList(), nullPath, log, 5000, new JavaUtilLog(), dirsToExclude);
                 t = null;
             } catch (Exception e) {
                 t = e;
@@ -188,7 +189,7 @@ public class QunitMavenRunnerTest {
         // when
         Exception err;
         try {
-            runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "/some-nonexistent-file.js", log, 5000, new JavaUtilLog());
+            runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "/some-nonexistent-file.js", log, 5000, new JavaUtilLog(),dirsToExclude);
             err = null;
         } catch (Exception e) {
             err = e;
@@ -220,7 +221,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Exception t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog(),dirsToExclude);
             t = null;
         } catch (Exception e) {
             t = e;
@@ -255,7 +256,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Exception t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog(),dirsToExclude);
             t = null;
         } catch (Exception e) {
             t = e;
@@ -293,7 +294,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Exception t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog(),dirsToExclude);
             t = null;
         } catch (Exception e) {
             t = e;
@@ -334,7 +335,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Exception t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog(),dirsToExclude);
             t = null;
         } catch (Exception e) {
             t = e;
@@ -373,7 +374,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Exception t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog(),dirsToExclude);
             t = null;
         } catch (Exception e) {
             t = e;
@@ -408,7 +409,7 @@ public class QunitMavenRunnerTest {
         List<String> problems;
         Throwable t;
         try {
-            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog());
+            problems = runner.run("", Collections.singletonList(projectDirectory), null, Collections.<File>emptyList(), "", log, 5000, new JavaUtilLog(),dirsToExclude);
             t = null;
         } catch (Throwable e) {
             t = e;

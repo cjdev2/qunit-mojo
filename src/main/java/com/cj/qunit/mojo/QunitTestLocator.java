@@ -1,12 +1,7 @@
 package com.cj.qunit.mojo;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class QunitTestLocator {
@@ -44,10 +39,10 @@ public class QunitTestLocator {
     }
 
     public List<LocatedTest> locateTests(final List<File> wheres, final String webRootRaw, final String requireBaseUrl){
-        return locateTests(wheres, webRootRaw, requireBaseUrl, null);
+        return locateTests(wheres, webRootRaw, requireBaseUrl, null, Collections.<String>emptyList());
     }
 
-    public List<LocatedTest> locateTests(final List<File> wheres, final String webRootRaw, final String requireBaseUrl, final String filter){
+    public List<LocatedTest> locateTests(final List<File> wheres, final String webRootRaw, final String requireBaseUrl, final String filter, List<String> dirsToExclude){
         if(wheres==null) throw new NullPointerException();
 
         final String webRoot = normalizedWebRoot(webRootRaw);
@@ -68,7 +63,7 @@ public class QunitTestLocator {
         final List<Foo> foos = new ArrayList<Foo>();
 
         long start = System.currentTimeMillis();
-        new PathSet(wheres).scanFiles(new PathSet.Visitor() {
+        new PathSet(wheres).scanFiles(dirsToExclude, new PathSet.Visitor() {
             @Override
             public void visit(File where, File path) {
             	foos.add(new Foo(where, path));

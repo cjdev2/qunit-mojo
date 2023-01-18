@@ -188,7 +188,7 @@ public class QunitMavenRunner {
         }
     }
     
-    public List<String> run(final String webRoot, final List<File> codePaths, final String filter, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Listener log, final int testTimeout, Logger jettyLog) {
+    public List<String> run(final String webRoot, final List<File> codePaths, final String filter, final List<File> extraPathsToServe, final String webPathToRequireDotJsConfig, final Listener log, final int testTimeout, Logger jettyLog, List<String> dirsToExclude) {
         final String requireDotJsConfig;
 
         final String normalizedWebRoot = normalizedWebRoot(webRoot);
@@ -201,7 +201,7 @@ public class QunitMavenRunner {
 
         validateJsConfigpath(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig);
 
-        final WebServerUtils.JettyPlusPortPlusScanner jetty = WebServerUtils.launchHttpServer(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig, jettyLog, true, filter);
+        final WebServerUtils.JettyPlusPortPlusScanner jetty = WebServerUtils.launchHttpServer(normalizedWebRoot, codePaths, extraPathsToServe, requireDotJsConfig, jettyLog, true, filter, dirsToExclude);
 
         try {
 

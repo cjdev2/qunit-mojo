@@ -227,7 +227,7 @@ public class QunitTestLocatorTest {
             QunitTestLocator locator = new QunitTestLocator();
 
             // when
-            List<LocatedTest> results = locator.locateTests(Collections.singletonList(projectDirectory), "/foo/bar/", "", filter);
+            List<LocatedTest> results = locator.locateTests(Collections.singletonList(projectDirectory), "/foo/bar/", "", filter, Collections.<String>emptyList());
 
             // then
             assertEquals(1, results.size());

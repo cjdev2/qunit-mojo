@@ -34,6 +34,11 @@ abstract class AbstractQunitMojo extends AbstractMojo {
      * @parameter 
      */
     private List<String> extraPathsToServe = new ArrayList<String>();
+
+    /**
+     * @parameter 
+     */
+    private final List<String> dirsToExclude = new ArrayList<String>();
     
     protected String webPathToRequireDotJsConfig() {
 		return webPathToRequireDotJsConfig;
@@ -45,6 +50,10 @@ abstract class AbstractQunitMojo extends AbstractMojo {
     
     protected List<File> codePaths(){
         return QunitTestLocator.findCodePaths(basedir);
+    }
+
+    protected List<String> dirsToExclude(){
+        return this.dirsToExclude;
     }
     
     public String webRoot() {
@@ -58,6 +67,7 @@ abstract class AbstractQunitMojo extends AbstractMojo {
             extraPathsToServe.add(new File(basedir, path));
         }
         System.out.println("The extra paths are " + extraPathsToServe);
+        System.out.println("dirsToExclude: " + this.dirsToExclude);
         return extraPathsToServe;
     }
 }

@@ -20,7 +20,7 @@ public class QunitServeMojo extends AbstractQunitMojo {
 
     public void execute() throws MojoFailureException {
         JettyPlusPortPlusScanner jetty = WebServerUtils.launchHttpServer(webRoot(), codePaths(), extraPathsToServe(), super.webPathToRequireDotJsConfig(),
-                new JettyMavenLogger("foobar", getLog()), false, filterPattern);
+                new JettyMavenLogger("foobar", getLog()), false, filterPattern, dirsToExclude());
         
         getLog().info("Server started: visit http://localhost:" + jetty.port + " to run your tests.");
         Object o = new Object();
